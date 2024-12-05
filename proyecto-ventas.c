@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
 
 #define LIMPIAR_PANTALLA system("cls")
 #define PAUSA system("pause")
 
+/*****************************************************************************
+ Definicion de estructuras
+*****************************************************************************/
 typedef struct stc_producto {
     int id_producto;
     char nombre_producto[101];
@@ -18,7 +20,7 @@ typedef struct stc_producto {
 typedef struct stc_lista_productos{
     tipo_producto *inicio;
     tipo_producto *fin;
-} lst_productos;
+} tipo_lst_productos;
 
 typedef struct stc_cliente {
     int id_cliente;
@@ -30,7 +32,7 @@ typedef struct stc_cliente {
 typedef struct stc_lista_clientes{
     tipo_cliente *inicio;
     tipo_cliente *fin;
-} lst_clientes;
+} tipo_lst_clientes;
 
 typedef struct stc_detalle_venta {
     int num_venta;
@@ -43,7 +45,7 @@ typedef struct stc_detalle_venta {
 typedef struct stc_lista_detalle{
     tipo_detalle_venta *inicio;
     tipo_detalle_venta *fin;
-} lst_detalle;
+} tipo_lst_detalle;
 
 typedef struct stc_venta {
     int num_venta;
@@ -51,15 +53,18 @@ typedef struct stc_venta {
     int hora;
     int num_cliente;
     tipo_cliente *cliente;
-    lst_detalle detalle;
+    tipo_lst_detalle detalle;
     struct stc_venta *siguiente;
 } tipo_venta;
 
 typedef struct stc_lista_ventas{
     tipo_venta *inicio;
     tipo_venta *fin;
-} lst_ventas;
+} tipo_lst_ventas;
 
+/*****************************************************************************
+ Definicion de prototipos
+*****************************************************************************/
 tipo_producto *malloc_producto();
 tipo_cliente *malloc_cliente();
 tipo_detalle_venta *malloc_detalle();
@@ -68,16 +73,31 @@ void menu_clientes();
 void menu_productos();
 void menu_ventas();
 void leer_archivo_clientes();
-void limpiar_lista_clientes(lst_clientes*);
-void insertar_cliente(lst_clientes*,tipo_cliente*);
+void limpiar_lista_clientes(tipo_lst_clientes*);
+void insertar_cliente(tipo_lst_clientes*,tipo_cliente*);
+void mostrar_clientes(tipo_lst_clientes);
+tipo_cliente *buscar_cliente(int,tipo_lst_clientes);
+void solicitar_buscar_cliente();
 void no_implementado();
 
-//Variables globales
-lst_productos Productos;
-lst_clientes Clientes;
-lst_ventas Ventas;
+/*****************************************************************************
+ Variables globales
+*****************************************************************************/
+tipo_lst_productos Productos;
+tipo_lst_clientes Clientes;
+tipo_lst_ventas Ventas;
 
+/*****************************************************************************
+ Implementacion de funciones generales o temporales(pruebas)
+*****************************************************************************/
+void no_implementado(){
+    printf("Aun no implementado\n presiona una tecla para continuar");
+    PAUSA;
+}
 
+/*****************************************************************************
+ Implementacion de funciones de asignacion de memoria
+*****************************************************************************/
 tipo_producto *malloc_producto(){
     tipo_producto *aux=malloc(sizeof(tipo_producto));
     int i;
@@ -134,6 +154,9 @@ tipo_venta *malloc_venta(){
     return aux;
 }
 
+/*****************************************************************************
+ Implementacion de funciones para cliente
+*****************************************************************************/
 void menu_clientes(){
     int opcion;
     do{
@@ -162,10 +185,10 @@ void menu_clientes(){
                 no_implementado();
                 break;
             case 5:
-                no_implementado();
+                solicitar_buscar_cliente();
                 break;
             case 6:
-                no_implementado();
+                mostrar_clientes(Clientes);
                 break;
             case 7:
                 break;
@@ -175,21 +198,6 @@ void menu_clientes(){
                 break;
         }
     }while(opcion!=7);
-}
-
-void no_implementado(){
-    printf("Aun no implementado\n presiona una tecla para continuar");
-    PAUSA;
-}
-
-void menu_productos(){
-    printf("Aun no implementado\n presiona una tecla para continuar");
-    PAUSA;
-}
-
-void menu_ventas(){
-    printf("Aun no implementado\n presiona una tecla para continuar");
-    PAUSA;
 }
 
 void leer_archivo_clientes(){
@@ -208,7 +216,7 @@ void leer_archivo_clientes(){
     }
 }
 
-void limpiar_lista_clientes(lst_clientes *lista){
+void limpiar_lista_clientes(tipo_lst_clientes *lista){
     tipo_cliente *siguiente;
     while(lista->inicio!=NULL){
         siguiente=lista->inicio->siguiente;
@@ -218,7 +226,7 @@ void limpiar_lista_clientes(lst_clientes *lista){
     lista->fin=NULL;
 }
 
-void insertar_cliente(lst_clientes *lista,tipo_cliente *cliente){
+void insertar_cliente(tipo_lst_clientes *lista,tipo_cliente *cliente){
     if(lista->inicio==NULL){
         lista->inicio=cliente;
         lista->fin=cliente;
@@ -230,6 +238,57 @@ void insertar_cliente(lst_clientes *lista,tipo_cliente *cliente){
     cliente->siguiente=NULL;
 }
 
+void mostrar_clientes(tipo_lst_clientes clientes){
+    tipo_cliente *actual=clientes.inicio;
+    while(actual!=NULL){
+        printf("%d\t%s\t%s\n",actual->id_cliente, actual->nombre, actual->telefono);
+        actual=actual->siguiente;
+    }
+    PAUSA;
+}
+
+tipo_cliente *buscar_cliente(int id_cliente,tipo_lst_clientes clientes){
+    tipo_cliente *actual=clientes.inicio;
+    while(actual!=NULL){
+        if(actual->id_cliente==id_cliente)
+            return actual;
+        actual=actual->siguiente;
+    }
+    return NULL;
+}
+
+void solicitar_buscar_cliente(){
+    int id_cliente;
+    tipo_cliente *cliente;
+    
+    printf("Id del cliente: ");
+    scanf("%d",&id_cliente);
+    cliente=buscar_cliente(id_cliente,Clientes);
+    if(cliente!=NULL){
+        printf("%d\t%s\t%s\n",cliente->id_cliente, cliente->nombre, cliente->telefono);
+    }
+    PAUSA;
+}
+
+/*****************************************************************************
+ Implementacion de funciones para productos
+*****************************************************************************/
+void menu_productos(){
+    printf("Aun no implementado\n presiona una tecla para continuar");
+    PAUSA;
+}
+
+/*****************************************************************************
+ Implementacion de funciones para ventas
+*****************************************************************************/
+void menu_ventas(){
+    printf("Aun no implementado\n presiona una tecla para continuar");
+    PAUSA;
+}
+
+/*****************************************************************************
+ Main
+*****************************************************************************/
 int main(){
     int opcion;
     do{
