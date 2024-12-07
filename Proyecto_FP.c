@@ -63,6 +63,7 @@ void listarProductos();
 void listarClientes();
 void listarVentas();
 void buscarCliente();
+void editarCliente();
 void buscarVenta();
 void limpiarPantalla();
 void pausar();
@@ -230,7 +231,7 @@ void guardarDatosProductos() {
 		prod = prod->sig;
 	}
 	fclose(Prod);
-	
+
 	printf("Los datos se han guardado con exito.\n");
 }
 void guardarDatosClientes() {
@@ -242,7 +243,7 @@ void guardarDatosClientes() {
 		cli = cli->sig;
 	}
 	fclose(Cli);
-	
+
 	printf("Los datos se han guardado con exito.\n");
 }
 void guardarDatosVentas() {
@@ -254,7 +255,7 @@ void guardarDatosVentas() {
 		vta = vta->sig;
 	}
 	fclose(Vta);
-	
+
 	printf("Los datos se han guardado con exito.\n");
 }
 void guardarDatosDetalleVtas() {
@@ -316,9 +317,10 @@ void menuClientes() {
 		printf("\n1. Agregar cliente");
 		printf("\n2. Borrar cliente");
 		printf("\n3. Buscar cliente");
-		printf("\n4. Listar clientes");
-		printf("\n5. Guardar clientes");
-		printf("\n6. Regresar a menu principal");
+		printf("\n4. Editar cliente");
+		printf("\n5. Listar clientes");
+		printf("\n6. Guardar clientes");
+		printf("\n7. Regresar a menu principal");
 		printf("\nIngresa tu opcion: ");
 		scanf(" %d",&opcion);
 		switch (opcion) {
@@ -331,12 +333,15 @@ void menuClientes() {
 				buscarCliente();
 				break;
 			case 4:
-				listarClientes();
+				editarCliente();
 				break;
 			case 5:
-				guardarDatosClientes();
+				listarClientes();
 				break;
 			case 6:
+				guardarDatosClientes();
+				break;
+			case 7:
 				printf("Volviendo al menu principal");
 				break;
 			default:
@@ -344,7 +349,7 @@ void menuClientes() {
 				break;
 		}
 		pausar();
-	} while(opcion!=6);
+	} while(opcion!=7);
 }
 
 void menuVentas() {
@@ -509,6 +514,51 @@ void buscarCliente() {
 	printf("Cliente con ID %d no encontrado.\n", id_cliente);
 }
 
+void editarCliente() {
+	int id_cliente, opc;
+	printf("Ingrese el ID del cliente a editar: ");
+	scanf("%d", &id_cliente);
+
+	struct Cliente *actual = clientes;
+	while (actual) {
+		if (actual->id_cli == id_cliente) {
+			printf("\nCliente encontrado");
+			do {
+				limpiarPantalla();
+				printf("Seleccione la opcion a editar: ");
+				printf("\n1. Nombre del cliente");
+				printf("\n2. Telefono del cliente");
+				printf("\n3. Volver al menu clientes");
+				printf("\nIngresa tu opcion: ");
+				scanf("%d", &opc);
+				switch (opc) {
+					case 1:
+						printf("Ingrese el nombre a editar: ");
+						scanf(" %49[^\n]", actual->nom_cli);
+						printf("\nNombre actualizado correctamente.");
+						break;
+					case 2:
+						printf("Ingrese el telefono a editar: ");
+						scanf(" %14[^\n]", actual->tel_cli);
+						printf("\nTelefono actualizado correctamente.");
+						break;
+					case 3:
+						printf("Volviendo al menu clientes...\n");
+						break;
+					default:
+						printf("Opcion invalida.\n");
+				}
+				pausar();
+			} while (opc != 3);
+
+			return;
+		}
+		actual = actual->sig;
+	}
+
+	printf("Cliente con ID %d no encontrado.\n", id_cliente);
+}
+
 void buscarVenta() {
 }
 
@@ -555,7 +605,6 @@ int main() {
 		}
 		pausar();
 	} while (opcion != 6);
-
 
 	return 0;
 }
