@@ -32,19 +32,19 @@ struct struct_lst_productos {//Definicion de struct_lst_productos
 	PRODUCTO *p_fin;
 };
 
-typedef struct struct_producto_venta PRODUCTO_VENTA;//Definimos el tipo de dato PRODUCTO_VENTA
-struct struct_producto_venta {//Definicion de struct_producto_venta
+typedef struct struct_detalle_venta DETALLE_VENTA;//Definimos el tipo de dato DETALLE_VENTA
+struct struct_detalle_venta {//Definicion de struct_detalle_venta
 	int num_venta;
 	int num_producto;
 	int cantidad;
 	PRODUCTO *p_producto;
-	PRODUCTO_VENTA *p_siguiente;
+	DETALLE_VENTA *p_siguiente;
 };
 
-typedef struct struct_lst_producto_venta LST_PRODUCTO_VENTA;//Definimos el tipo de dato LST_PRODUCTO_VENTA
-struct struct_lst_producto_venta {//Definicion de struct_lst_producto_venta
-	PRODUCTO_VENTA *p_inicio;
-	PRODUCTO_VENTA *p_fin;
+typedef struct struct_lst_detalle_venta LST_DETALLE_VENTA;//Definimos el tipo de dato LST_DETALLE_VENTA
+struct struct_lst_detalle_venta {//Definicion de struct_lst_detalle_venta
+	DETALLE_VENTA *p_inicio;
+	DETALLE_VENTA *p_fin;
 };
 
 typedef struct struct_venta VENTA;//Definimos el tipo de dato VENTA
@@ -52,7 +52,7 @@ struct struct_venta {//Definicion de struct_venta
 	int num_venta;
 	int fecha;
 	int hora;
-	LST_PRODUCTO_VENTA lista_productos;
+	LST_DETALLE_VENTA lista_productos;
 	VENTA *p_siguiente;
 };
 
@@ -79,9 +79,9 @@ void agregar_producto(LST_PRODUCTO*,PRODUCTO);
 void entrada_producto();
 
 /*** producto venta ***/
-PRODUCTO_VENTA *p_nuevo_producto_venta(void);
-void agregar_producto_venta(LST_PRODUCTO_VENTA*,PRODUCTO_VENTA);
-LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta);
+DETALLE_VENTA *p_nuevo_detalle_venta(void);
+void agregar_detalle_venta(LST_DETALLE_VENTA*,DETALLE_VENTA);
+LST_DETALLE_VENTA entrada_detalle_venta(int num_venta);
 
 /*** venta ***/
 VENTA *p_nueva_venta(void);
@@ -133,13 +133,13 @@ void entrada_producto(){
 /*****************************************************************************
  Funciones de producto venta
 *****************************************************************************/
-PRODUCTO_VENTA *p_nuevo_producto_venta(void){
-	return (PRODUCTO_VENTA *) calloc(sizeof(PRODUCTO_VENTA),1);
+DETALLE_VENTA *p_nuevo_detalle_venta(void){
+	return (DETALLE_VENTA *) calloc(sizeof(DETALLE_VENTA),1);
 }
 
-void agregar_producto_venta(LST_PRODUCTO_VENTA *p_lista, PRODUCTO_VENTA producto_venta) {
-	PRODUCTO_VENTA *p_nuevo=p_nuevo_producto_venta();
-	*p_nuevo=producto_venta;
+void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_venta) {
+	DETALLE_VENTA *p_nuevo=p_nuevo_detalle_venta();
+	*p_nuevo=detalle_venta;
 	if(p_lista->p_fin!=NULL) {
 		p_lista->p_fin->p_siguiente=p_nuevo;
 		p_nuevo->p_siguiente=NULL;
@@ -151,31 +151,31 @@ void agregar_producto_venta(LST_PRODUCTO_VENTA *p_lista, PRODUCTO_VENTA producto
     }    
 }
 
-LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta){
-    PRODUCTO_VENTA producto_venta;
-    LST_PRODUCTO_VENTA lista_producto_venta;
+LST_DETALLE_VENTA entrada_detalle_venta(int num_venta){
+    DETALLE_VENTA detalle_venta;
+    LST_DETALLE_VENTA lista_detalle_venta;
     char buffer[50];
     
-    lista_producto_venta.p_inicio=NULL;
-    lista_producto_venta.p_fin=NULL;
+    lista_detalle_venta.p_inicio=NULL;
+    lista_detalle_venta.p_fin=NULL;
     
-    producto_venta.num_venta=num_venta;
+    detalle_venta.num_venta=num_venta;
     do{                    
         printf("Numero de producto: ");
-        scanf(" %d",&producto_venta.num_producto);
+        scanf(" %d",&detalle_venta.num_producto);
         printf("Cantidad: ");
-        scanf(" %d",&producto_venta.cantidad);
+        scanf(" %d",&detalle_venta.cantidad);
         
-        producto_venta.p_producto=NULL;
-        producto_venta.p_siguiente=NULL;
+        detalle_venta.p_producto=NULL;
+        detalle_venta.p_siguiente=NULL;
         
-        agregar_producto_venta(&lista_producto_venta,producto_venta);
+        agregar_detalle_venta(&lista_detalle_venta,detalle_venta);
         
         printf("Escriba fin para terminar, cualquier otra cosa para agregar un "
                 "producto adicional\n");
         scanf(" %s",buffer);
     }while(strcmp("fin",buffer)!=0);
-    return lista_producto_venta;
+    return lista_detalle_venta;
 }
 
 /*****************************************************************************
@@ -209,7 +209,7 @@ void entrada_venta(){
     printf("Hora de venta: ");
     scanf(" %d",&venta.hora);
     
-    venta.lista_productos=entrada_producto_venta(venta.num_venta);
+    venta.lista_productos=entrada_detalle_venta(venta.num_venta);
     agregar_venta(&Ventas,venta);
 }
 
