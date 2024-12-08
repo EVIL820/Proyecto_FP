@@ -79,7 +79,7 @@ void agregar_producto(LST_PRODUCTO*,PRODUCTO);
 void entrada_producto();
 
 /*** producto venta ***/
-PRODUCTO_VENTA *nuevo_producto_venta(void);
+PRODUCTO_VENTA *p_nuevo_producto_venta(void);
 void agregar_producto_venta(LST_PRODUCTO_VENTA*,PRODUCTO_VENTA);
 LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta);
 
@@ -122,11 +122,11 @@ void entrada_producto(){
     printf("Nombre del producto: ");
     scanf(" %50[^\n]",producto.nombre_producto);
     printf("Precio de compra: ");
-    scanf(" %f",producto.precio_compra);
+    scanf(" %f",&producto.precio_compra);
     printf("Unidades en existencia: ");
-    scanf(" %d",producto.existencia);
+    scanf(" %d",&producto.existencia);
     printf("Precio de venta: ");
-    scanf(" %f",producto.precio_venta);
+    scanf(" %f",&producto.precio_venta);
     
     agregar_producto(&Productos,producto);
 }
