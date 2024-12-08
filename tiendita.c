@@ -15,13 +15,13 @@ struct struct_producto{
 	float precio_compra;
 	int existencia;
 	float precio_venta;
-	tipo_st_producto *siguiente;
+	PRODUCTO *siguiente;
 };
 
 typedef struct struct_lst_productos LST_PRODUCTO;
 struct struct_lst_productos{
-	tipo_st_producto *inicio;
-	tipo_st_producto *fin;
+	PRODUCTO *inicio;
+	PRODUCTO *fin;
 };
 
 typedef struct struct_producto_venta PRODUCTO_VENTA;
@@ -59,5 +59,68 @@ struct struct_lst_venta{
 *****************************************************************************/
 LST_PRODUCTO Productos;
 LST_VENTA Ventas;
+/*****************************************************************************
+ Funciones prototipo 
+*****************************************************************************/
+/*** producto ***/
+PRODUCTO *nuevo_producto(void);
+void agregar_producto(LST_PRODUCTO*,PRODUCTO);
 
+/*** producto venta ***/
+PRODUCTO_VENTA *nuevo_producto_venta(void);
+void agregar_producto_venta(LST_PRODUCTO_VENTA*,PRODUCTO_VENTA);
 
+/*** venta ***/
+VENTA *nueva_venta(void);
+void agregar_venta(LST_VENTA*,VENTA);
+
+/*****************************************************************************
+Funciones de producto
+*****************************************************************************/
+PRODUCTO *nuevo_producto(void){
+    return (PRODUCTO *) calloc(sizeof(PRODUCTO),1);
+}
+
+void agregar_producto(LST_PRODUCTO *lista, PRODUCTO producto){
+    PRODUCTO *nuevo=nuevo_producto();
+    *nuevo=*producto;
+    if(lista->fin!=NULL){
+        lista->fin->siguiente=nuevo;
+        nuevo->siguiente=NULL;
+        lista->fin=nuevo;
+    }
+}
+
+/*****************************************************************************
+ Funciones de producto venta
+*****************************************************************************/
+PRODUCTO_VENTA *nuevo_producto_venta(void) {
+    return (PRODUCTO_VENTA *) calloc(sizeof(PRODUCTO_VENTA),1);    
+}
+
+void agregar_producto_venta(LST_PRODUCTO_VENTA *lista, PRODUCTO_VENTA producto_venta){
+    PRODUCTO_VENTA *nuevo=nuevo_producto_venta();
+    *nuevo=*producto_venta;
+    if(lista->fin!=NULL){
+        lista->fin->siguiente=nuevo;
+        nuevo->siguiente=NULL;
+        lista->fin=nuevo;
+    }
+}
+
+/*****************************************************************************
+ Funciones de venta
+*****************************************************************************/
+VENTA *nuevo_venta(void) {
+    return (VENTA *) calloc(sizeof(VENTA),1);    
+}
+
+void agregar_venta(LST_VENTA *lista, VENTA venta){
+    VENTA *nuevo=nuevo_venta();
+    *nuevo=*venta;
+    if(lista->fin!=NULL){
+        lista->fin->siguiente=nuevo;
+        nuevo->siguiente=NULL;
+        lista->fin=nuevo;
+    }
+}
