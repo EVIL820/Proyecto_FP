@@ -78,14 +78,18 @@ PRODUCTO *p_nuevo_producto(void);
 void agregar_producto(LST_PRODUCTO*,PRODUCTO);
 void entrada_producto();
 
-/*** producto venta ***/
+/*** detalle venta ***/
 DETALLE_VENTA *p_nuevo_detalle_venta(void);
 void agregar_detalle_venta(LST_DETALLE_VENTA*,DETALLE_VENTA);
 LST_DETALLE_VENTA entrada_detalle_venta(int num_venta);
+void mostrar_detalle_venta(DETALLE_VENTA);
+void mostrar_lista_detalle_venta(LST_DETALLE_VENTA);
 
 /*** venta ***/
 VENTA *p_nueva_venta(void);
 void agregar_venta(LST_VENTA*,VENTA);
+void mostrar_venta(VENTA);
+void mostrar_lista_venta(LST_VENTA);
 
 /*** menu productos***/
 void menu_productos();
@@ -103,6 +107,8 @@ PRODUCTO *p_nuevo_producto(void) {
 void agregar_producto(LST_PRODUCTO *p_lista, PRODUCTO producto) {
 	PRODUCTO *p_nuevo=p_nuevo_producto();
 	*p_nuevo=producto;
+    p_nuevo->p_siguiente=NULL;
+    
 	if(p_lista->p_fin!=NULL) {
 		p_lista->p_fin->p_siguiente=p_nuevo;
 		p_nuevo->p_siguiente=NULL;
@@ -131,7 +137,7 @@ void entrada_producto(){
     agregar_producto(&Productos,producto);
 }
 /*****************************************************************************
- Funciones de producto venta
+ Funciones de detalle venta
 *****************************************************************************/
 DETALLE_VENTA *p_nuevo_detalle_venta(void){
 	return (DETALLE_VENTA *) calloc(sizeof(DETALLE_VENTA),1);
@@ -140,6 +146,8 @@ DETALLE_VENTA *p_nuevo_detalle_venta(void){
 void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_venta) {
 	DETALLE_VENTA *p_nuevo=p_nuevo_detalle_venta();
 	*p_nuevo=detalle_venta;
+    p_nuevo->p_siguiente=NULL;
+    
 	if(p_lista->p_fin!=NULL) {
 		p_lista->p_fin->p_siguiente=p_nuevo;
 		p_nuevo->p_siguiente=NULL;
@@ -178,6 +186,20 @@ LST_DETALLE_VENTA entrada_detalle_venta(int num_venta){
     return lista_detalle_venta;
 }
 
+void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
+    printf(" %d\t%d\t%d\n", detalle_venta.num_venta, detalle_venta.num_producto,
+        detalle_venta.cantidad);
+}
+
+void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
+    DETALLE_VENTA *p_actual=lista.p_inicio;
+    
+    while(p_actual!=NULL) {
+        mostrar_detalle_venta(*p_actual);
+        p_actual=p_actual->p_siguiente;
+    }
+}
+
 /*****************************************************************************
  Funciones de venta
 *****************************************************************************/
@@ -188,6 +210,8 @@ VENTA *p_nueva_venta(void) {
 void agregar_venta(LST_VENTA *p_lista, VENTA venta) {
 	VENTA *p_nuevo=p_nueva_venta();
 	*p_nuevo=venta;
+    p_nuevo->p_siguiente=NULL;
+    
 	if(p_lista->p_fin!=NULL) {
 		p_lista->p_fin->p_siguiente=p_nuevo;
 		p_nuevo->p_siguiente=NULL;
@@ -211,6 +235,20 @@ void entrada_venta(){
     
     venta.lista_productos=entrada_detalle_venta(venta.num_venta);
     agregar_venta(&Ventas,venta);
+}
+
+void mostrar_venta(VENTA venta){
+    printf("%d\t%d\t%d\n", venta.num_venta, venta.fecha, venta.hora);
+    mostrar_lista_detalle_venta(venta.lista_productos);
+}
+
+void mostrar_lista_venta(LST_VENTA lista){
+    VENTA *p_actual=lista.p_inicio;
+    
+    while(p_actual!=NULL) {
+        mostrar_venta(*p_actual);
+        p_actual=p_actual->p_siguiente;
+    }
 }
 
 /*****************************************************************************
@@ -276,6 +314,7 @@ void menu_ventas() {
 			case 3:
 				break;
 			case 4:
+                mostrar_lista_venta(Ventas);
 				break;
 			case 5:
 				break;
