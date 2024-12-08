@@ -10,55 +10,56 @@
 * Las variables globales la primera letra en mayusculas y el resto en 
 * minusculas
 * Las variables locales y los parametros en minusculas
+* Apuntadores o punteros, funciones y variables van con p_
 *****************************************************************************/
 
 /*****************************************************************************
  Definicion de estructuras
 *****************************************************************************/
-typedef struct struct_producto PRODUCTO;
-struct struct_producto {
+typedef struct struct_producto PRODUCTO; //Definimos el tipo de dato PRODUCTO
+struct struct_producto {//Definicion de struct_producto
 	int id_producto;
 	char nombre_producto[51];
 	float precio_compra;
 	int existencia;
 	float precio_venta;
-	PRODUCTO *siguiente;
+	PRODUCTO *p_siguiente;
 };
 
-typedef struct struct_lst_productos LST_PRODUCTO;
-struct struct_lst_productos {
-	PRODUCTO *inicio;
-	PRODUCTO *fin;
+typedef struct struct_lst_productos LST_PRODUCTO;//Definimos el tipo de dato LST_PRODUCTO
+struct struct_lst_productos {//Definicion de struct_lst_productos
+	PRODUCTO *p_inicio;
+	PRODUCTO *p_fin;
 };
 
-typedef struct struct_producto_venta PRODUCTO_VENTA;
-struct struct_producto_venta {
+typedef struct struct_producto_venta PRODUCTO_VENTA;//Definimos el tipo de dato PRODUCTO_VENTA
+struct struct_producto_venta {//Definicion de struct_producto_venta
 	int num_venta;
 	int num_producto;
 	int cantidad;
-	PRODUCTO *producto;
-	PRODUCTO_VENTA *siguiente;
+	PRODUCTO *p_producto;
+	PRODUCTO_VENTA *p_siguiente;
 };
 
-typedef struct struct_lst_producto_venta LST_PRODUCTO_VENTA;
-struct struct_lst_producto_venta {
-	PRODUCTO_VENTA *inicio;
-	PRODUCTO_VENTA *fin;
+typedef struct struct_lst_producto_venta LST_PRODUCTO_VENTA;//Definimos el tipo de dato LST_PRODUCTO_VENTA
+struct struct_lst_producto_venta {//Definicion de struct_lst_producto_venta
+	PRODUCTO_VENTA *p_inicio;
+	PRODUCTO_VENTA *p_fin;
 };
 
-typedef struct struct_venta VENTA;
-struct struct_venta {
+typedef struct struct_venta VENTA;//Definimos el tipo de dato VENTA
+struct struct_venta {//Definicion de struct_venta
 	int num_venta;
 	int fecha;
 	int hora;
 	LST_PRODUCTO_VENTA lista_productos;
-	VENTA *siguiente;
+	VENTA *p_siguiente;
 };
 
-typedef struct struct_lst_venta LST_VENTA;
-struct struct_lst_venta {
-	VENTA *inicio;
-	VENTA *fin;
+typedef struct struct_lst_venta LST_VENTA;//Definimos el tipo de dato LST_VENTA
+struct struct_lst_venta {//Definicion de struct_lst_venta
+	VENTA *p_inicio;
+	VENTA *p_fin;
 };
 
 /*****************************************************************************
@@ -73,7 +74,7 @@ LST_VENTA Ventas;
 *****************************************************************************/
 
 /*** producto ***/
-PRODUCTO *nuevo_producto(void);
+PRODUCTO *p_nuevo_producto(void);
 void agregar_producto(LST_PRODUCTO*,PRODUCTO);
 void entrada_producto();
 
@@ -83,7 +84,7 @@ void agregar_producto_venta(LST_PRODUCTO_VENTA*,PRODUCTO_VENTA);
 LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta);
 
 /*** venta ***/
-VENTA *nueva_venta(void);
+VENTA *p_nueva_venta(void);
 void agregar_venta(LST_VENTA*,VENTA);
 
 /*** menu productos***/
@@ -95,21 +96,21 @@ void menu_ventas();
 /*****************************************************************************
 Funciones de producto
 *****************************************************************************/
-PRODUCTO *nuevo_producto(void) {
+PRODUCTO *p_nuevo_producto(void) {
 	return (PRODUCTO *) calloc(sizeof(PRODUCTO),1);
 }
 
-void agregar_producto(LST_PRODUCTO *lista, PRODUCTO producto) {
-	PRODUCTO *nuevo=nuevo_producto();
-	*nuevo=producto;
-	if(lista->fin!=NULL) {
-		lista->fin->siguiente=nuevo;
-		nuevo->siguiente=NULL;
-		lista->fin=nuevo;
+void agregar_producto(LST_PRODUCTO *p_lista, PRODUCTO producto) {
+	PRODUCTO *p_nuevo=p_nuevo_producto();
+	*p_nuevo=producto;
+	if(p_lista->p_fin!=NULL) {
+		p_lista->p_fin->p_siguiente=p_nuevo;
+		p_nuevo->p_siguiente=NULL;
+		p_lista->p_fin=p_nuevo;
 	}
     else{
-        lista->inicio=nuevo;
-        lista->fin=nuevo;      
+        p_lista->p_inicio=p_nuevo;
+        p_lista->p_fin=p_nuevo;      
     }
 }
 
@@ -132,21 +133,21 @@ void entrada_producto(){
 /*****************************************************************************
  Funciones de producto venta
 *****************************************************************************/
-PRODUCTO_VENTA *nuevo_producto_venta(void) {
+PRODUCTO_VENTA *p_nuevo_producto_venta(void){
 	return (PRODUCTO_VENTA *) calloc(sizeof(PRODUCTO_VENTA),1);
 }
 
-void agregar_producto_venta(LST_PRODUCTO_VENTA *lista, PRODUCTO_VENTA producto_venta) {
-	PRODUCTO_VENTA *nuevo=nuevo_producto_venta();
-	*nuevo=producto_venta;
-	if(lista->fin!=NULL) {
-		lista->fin->siguiente=nuevo;
-		nuevo->siguiente=NULL;
-		lista->fin=nuevo;
+void agregar_producto_venta(LST_PRODUCTO_VENTA *p_lista, PRODUCTO_VENTA producto_venta) {
+	PRODUCTO_VENTA *p_nuevo=p_nuevo_producto_venta();
+	*p_nuevo=producto_venta;
+	if(p_lista->p_fin!=NULL) {
+		p_lista->p_fin->p_siguiente=p_nuevo;
+		p_nuevo->p_siguiente=NULL;
+		p_lista->p_fin=p_nuevo;
 	}
     else{
-        lista->inicio=nuevo;
-        lista->fin=nuevo;      
+        p_lista->p_inicio=p_nuevo;
+        p_lista->p_fin=p_nuevo;      
     }    
 }
 
@@ -155,8 +156,8 @@ LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta){
     LST_PRODUCTO_VENTA lista_producto_venta;
     char buffer[50];
     
-    lista_producto_venta.inicio=NULL;
-    lista_producto_venta.fin=NULL;
+    lista_producto_venta.p_inicio=NULL;
+    lista_producto_venta.p_fin=NULL;
     
     producto_venta.num_venta=num_venta;
     do{                    
@@ -165,12 +166,12 @@ LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta){
         printf("Cantidad: ");
         scanf(" %d",&producto_venta.cantidad);
         
-        producto_venta.producto=NULL;
-        producto_venta.siguiente=NULL;
+        producto_venta.p_producto=NULL;
+        producto_venta.p_siguiente=NULL;
         
         agregar_producto_venta(&lista_producto_venta,producto_venta);
         
-        printf("Escriba fin para terminar, cualquier otra para agregar un "
+        printf("Escriba fin para terminar, cualquier otra cosa para agregar un "
                 "producto adicional\n");
         scanf(" %s",buffer);
     }while(strcmp("fin",buffer)!=0);
@@ -180,21 +181,21 @@ LST_PRODUCTO_VENTA entrada_producto_venta(int num_venta){
 /*****************************************************************************
  Funciones de venta
 *****************************************************************************/
-VENTA *nuevo_venta(void) {
+VENTA *p_nueva_venta(void) {
 	return (VENTA *) calloc(sizeof(VENTA),1);
 }
 
-void agregar_venta(LST_VENTA *lista, VENTA venta) {
-	VENTA *nuevo=nuevo_venta();
-	*nuevo=venta;
-	if(lista->fin!=NULL) {
-		lista->fin->siguiente=nuevo;
-		nuevo->siguiente=NULL;
-		lista->fin=nuevo;
+void agregar_venta(LST_VENTA *p_lista, VENTA venta) {
+	VENTA *p_nuevo=p_nueva_venta();
+	*p_nuevo=venta;
+	if(p_lista->p_fin!=NULL) {
+		p_lista->p_fin->p_siguiente=p_nuevo;
+		p_nuevo->p_siguiente=NULL;
+		p_lista->p_fin=p_nuevo;
 	}
     else{
-        lista->inicio=nuevo;
-        lista->fin=nuevo;      
+        p_lista->p_inicio=p_nuevo;
+        p_lista->p_fin=p_nuevo;      
     }    
 }
 
