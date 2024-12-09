@@ -158,7 +158,7 @@ void entrada_producto(){
 }
 
 void mostrar_producto(PRODUCTO producto){
-    printf("%d\t%s\t%f\t%d\t%f\n", producto.id_producto, producto.nombre_producto, producto.precio_compra,
+    printf("%d\t%s\t%.2f\t%d\t%.2f\n", producto.id_producto, producto.nombre_producto, producto.precio_compra,
            producto.existencia, producto.precio_venta);
 }
 
@@ -465,10 +465,10 @@ void menu_productos() {
                 guardar_archivo_producto();
 				break;
 			case 6:
-				printf("Volviendo al menu principal");
+				printf("Volviendo al menu principal\n");
 				break;
 			default:
-				printf("\nOpcion invalida\n presiona una tecla para continuar");
+				printf("Opcion invalida\n");
 				break;
 		}
 		PAUSA;
@@ -506,10 +506,10 @@ void menu_ventas() {
 			case 5:
 				break;
 			case 6:
-				printf("Volviendo al menu principal");
+				printf("Volviendo al menu principal\n");
 				break;
 			default:
-				printf("\nOpcion invalida\n presiona una tecla para continuar");
+				printf("Opcion invalida\n");
 				break;
 		}
 		PAUSA;
@@ -547,14 +547,14 @@ int main() {
 				//guardarDatos();
 				break;
 			case 4:
-				printf("Saliendo del programa. Tenga buen dia.");
+				printf("Saliendo del programa. Tenga buen dia.\n");
+				PAUSA;
 				break;
 			default:
 				printf("Opcion invalida\n");
 				PAUSA;
 				break;
 		}
-		PAUSA;
 	} while (opcion != 4);
     
     guardar_archivo_producto();
