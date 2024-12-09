@@ -55,7 +55,7 @@ struct struct_venta {//Definicion de struct_venta
 	int num_venta;
 	int fecha;
 	int hora;
-	LST_DETALLE_VENTA lista_productos;
+	//LST_DETALLE_VENTA lista_productos;
 	VENTA *p_siguiente;
 };
 
@@ -92,9 +92,10 @@ void limpiar_lista_producto(LST_PRODUCTO*);
 /*** detalle venta ***/
 DETALLE_VENTA *p_nuevo_detalle_venta(void);
 void agregar_detalle_venta(LST_DETALLE_VENTA*,DETALLE_VENTA);
-LST_DETALLE_VENTA entrada_detalle_venta(int num_venta);
+void entrada_detalle_venta(int num_venta);
 void mostrar_detalle_venta(DETALLE_VENTA);
 void mostrar_lista_detalle_venta(LST_DETALLE_VENTA);
+void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA,int);
 void leer_archivo_detalle_venta(void);
 void limpiar_lista_detalle_venta(LST_DETALLE_VENTA*);
 void guardar_archivo_detalle_venta();
@@ -211,8 +212,9 @@ void guardar_archivo_producto(void){
     PRODUCTO *p_actual=Productos.p_inicio;
     p_archivo=fopen(F_NOM_PRODUCTOS,"w+");
     while(p_actual !=NULL){
-        fprintf(p_archivo,"%d|%[^|]|%f|%d|%f",p_actual->id_producto,p_actual->nombre_producto,p_actual->precio_compra,
+        fprintf(p_archivo,"%d|%s|%.2f|%d|%.2f\n",p_actual->id_producto,p_actual->nombre_producto,p_actual->precio_compra,
                 p_actual->existencia,p_actual->precio_venta);
+        p_actual=p_actual->p_siguiente;
     }
     fclose(p_archivo);    
 }
@@ -251,13 +253,13 @@ void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_ven
     }    
 }
 
-LST_DETALLE_VENTA entrada_detalle_venta(int num_venta){
+void entrada_detalle_venta(int num_venta){
     DETALLE_VENTA detalle_venta;
-    LST_DETALLE_VENTA lista_detalle_venta;
+    //LST_DETALLE_VENTA lista_detalle_venta;
     char buffer[50];
     
-    lista_detalle_venta.p_inicio=NULL;
-    lista_detalle_venta.p_fin=NULL;
+    //lista_detalle_venta.p_inicio=NULL;
+    //lista_detalle_venta.p_fin=NULL;
     
     detalle_venta.num_venta=num_venta;
     do{                    
@@ -269,13 +271,13 @@ LST_DETALLE_VENTA entrada_detalle_venta(int num_venta){
         detalle_venta.p_producto=buscar_producto(Productos,detalle_venta.num_producto);
         detalle_venta.p_siguiente=NULL;
         
-        agregar_detalle_venta(&lista_detalle_venta,detalle_venta);
+        agregar_detalle_venta(&Detalles,detalle_venta);
         
         printf("Escriba fin para terminar, cualquier otra cosa para agregar un "
                 "producto adicional\n");
         scanf(" %s",buffer);
     }while(strcmp("fin",buffer)!=0);
-    return lista_detalle_venta;
+    //return lista_detalle_venta;
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
@@ -288,6 +290,16 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
     
     while(p_actual!=NULL) {
         mostrar_detalle_venta(*p_actual);
+        p_actual=p_actual->p_siguiente;
+    }
+}
+
+void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA lista,int num_venta){
+    DETALLE_VENTA *p_actual=lista.p_inicio;
+    
+    while(p_actual!=NULL) {
+        if (p_actual->num_venta==num_venta)
+            mostrar_detalle_venta(*p_actual);
         p_actual=p_actual->p_siguiente;
     }
 }
@@ -323,6 +335,7 @@ void guardar_archivo_detalle_venta(){
     p_archivo=fopen(F_NOM_DETALLE_VENTAS,"w+");
     while(p_actual !=NULL){
         fprintf(p_archivo,"%d|%d|%d\n",p_actual->num_venta,p_actual->num_producto,p_actual->cantidad);
+        p_actual=p_actual->p_siguiente;
     }
     fclose(p_archivo);   
 
@@ -361,13 +374,13 @@ void entrada_venta(){
     printf("Hora de venta: ");
     scanf(" %d",&venta.hora);
     
-    venta.lista_productos=entrada_detalle_venta(venta.num_venta);
+    entrada_detalle_venta(venta.num_venta);
     agregar_venta(&Ventas,venta);
 }
 
 void mostrar_venta(VENTA venta){
     printf("%d\t%d\t%d\n", venta.num_venta, venta.fecha, venta.hora);
-    mostrar_lista_detalle_venta(venta.lista_productos);
+    mostrar_lista_detalle_venta_por_num(Detalles,venta.num_venta);
 }
 
 void mostrar_lista_venta(LST_VENTA lista){
@@ -400,6 +413,7 @@ void guardar_archivo_venta(){
     p_archivo=fopen(F_NOM_VENTAS,"w+");
     while(p_actual !=NULL){
         fprintf(p_archivo,"%d|%d|%d\n",p_actual->num_venta,p_actual->fecha,p_actual->hora);
+        p_actual=p_actual->p_siguiente;
     }
     fclose(p_archivo);   
 
@@ -509,6 +523,9 @@ int main() {
 	int opcion;
     
     leer_archivo_producto();
+    leer_archivo_venta();
+    leer_archivo_detalle_venta();
+    
 	do {
 		LIMPIAR_PANTALLA;
 		printf("Menu principal");
@@ -539,6 +556,10 @@ int main() {
 		}
 		PAUSA;
 	} while (opcion != 4);
-
+    
+    guardar_archivo_producto();
+    guardar_archivo_venta();
+    guardar_archivo_detalle_venta();
+    
 	return 0;
 }
