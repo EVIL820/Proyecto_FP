@@ -1,0 +1,22 @@
+1|Abeto Negro Black Spruce 5 mL |322.26|67|451.164
+2|Abeto Siberiano Siberian Fir 15 mL |139.36|83|195.104
+3|Aceite Fraccionado de Coco Fractionated Coconut Oil 115 mL|369.52|43|517.328
+4|Albahaca Basil 15 mL |458.39|94|641.746
+5|Arbol de Te Tea Tree 15 mL |449.88|93|629.832
+6|Arbol de Te Touch DT Melaleuca 10 mL |387.22|81|542.108
+7|Arborvitae (Arbol de la vida) Arborvitae 5 mL |327.33|13|458.262
+8|Baya de Enebro Juniper Berry 5 mL |377.62|14|528.668
+9|Bergamota Bergamot 15 mL |443.62|25|621.068
+10|Birch / Abedul Birch 5 mL |477.15|70|668.01
+11|Blue Lotus touch Blue Lotus touch 10 mL |338.16|11|473.424
+12|Blue Tansy (Tansy Azul) Blue Tansy 5 mL |294.17|10|411.838
+13|Cananga Cananga 15 mL |342.62|52|479.668
+14|Canela Cinnamon 5 mL |452.8|31|633.92
+15|Cardamomo Cardamom 5 mL |413.59|38|579.026
+16|Casia Cassia 15 mL |225.28|61|315.392
+17|Cedro Cedarwood 15 mL |145.91|100|204.274
+18|Cilantro Cilantro 15 mL |220.13|46|308.182
+19|Cipres Cypress 15 mL |462.61|100|647.654
+20|Citronela Citronella 15 mL |485.62|15|679.868
+21|Clavo Clove 15 mL |389.45|47|545.23
+22|Clementina Clementine 15 mL |305.18|77|427.252

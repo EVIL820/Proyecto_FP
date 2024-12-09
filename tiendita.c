@@ -4,6 +4,9 @@
 
 #define LIMPIAR_PANTALLA system("cls")
 #define PAUSA system("pause")
+#define F_NOM_PRODUCTOS "Productos.txt"
+#define F_NOM_VENTAS "Ventas.txt"
+#define F_NOM_DETALLE_VENTAS "Detalle-ventas.txt"
 
 /*****************************************************************************
 * Los tipos de datos van en mayusculas 
@@ -19,7 +22,7 @@
 typedef struct struct_producto PRODUCTO; //Definimos el tipo de dato PRODUCTO
 struct struct_producto {//Definicion de struct_producto
 	int id_producto;
-	char nombre_producto[51];
+	char nombre_producto[101];
 	float precio_compra;
 	int existencia;
 	float precio_venta;
@@ -76,7 +79,14 @@ LST_VENTA Ventas;
 /*** producto ***/
 PRODUCTO *p_nuevo_producto(void);
 void agregar_producto(LST_PRODUCTO*,PRODUCTO);
-void entrada_producto();
+void entrada_producto(void);
+void mostrar_producto(PRODUCTO);
+void mostrar_lista_producto(LST_PRODUCTO);
+PRODUCTO *buscar_producto(LST_PRODUCTO,int);
+void mostrar_busqueda_producto();
+void leer_archivo_producto(void);
+void guardar_archivo_producto(void);
+void limpiar_lista_producto(LST_PRODUCTO*);
 
 /*** detalle venta ***/
 DETALLE_VENTA *p_nuevo_detalle_venta(void);
@@ -88,6 +98,7 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA);
 /*** venta ***/
 VENTA *p_nueva_venta(void);
 void agregar_venta(LST_VENTA*,VENTA);
+void entrada_venta();
 void mostrar_venta(VENTA);
 void mostrar_lista_venta(LST_VENTA);
 
@@ -136,6 +147,79 @@ void entrada_producto(){
     
     agregar_producto(&Productos,producto);
 }
+
+void mostrar_producto(PRODUCTO producto){
+    printf("%d\t%s\t%f\t%d\t%f\n", producto.id_producto, producto.nombre_producto, producto.precio_compra,
+           producto.existencia, producto.precio_venta);
+}
+
+PRODUCTO *buscar_producto(LST_PRODUCTO lista,int id_producto){
+    PRODUCTO *p_actual=lista.p_inicio;
+    
+    while(p_actual!=NULL){
+        if(p_actual->id_producto==id_producto)
+            return (PRODUCTO *)p_actual;
+        p_actual=p_actual->p_siguiente;
+    }
+    return NULL;
+}
+
+void mostrar_lista_producto(LST_PRODUCTO lista){
+    PRODUCTO *p_actual=lista.p_inicio;
+    
+    while(p_actual!=NULL) {
+        mostrar_producto(*p_actual);
+        p_actual=p_actual->p_siguiente;
+    }
+}
+
+void mostrar_busqueda_producto(){
+    PRODUCTO *p_actual=NULL;
+    int id_producto;
+    printf("Ingrese el ID del producto: ");
+    scanf("%d",&id_producto);
+    p_actual=buscar_producto(Productos,id_producto);
+    if(p_actual!=NULL)  
+        mostrar_producto(*p_actual);
+}
+
+void leer_archivo_producto(void){
+    FILE *p_archivo;
+    PRODUCTO producto;
+    p_archivo=fopen(F_NOM_PRODUCTOS,"r");
+    
+    limpiar_lista_producto(&Productos);
+    
+    while(fscanf(p_archivo,"%d|%[^|]|%f|%d|%f",&producto.id_producto,producto.nombre_producto,&producto.precio_compra,
+                &producto.existencia,&producto.precio_venta)!=EOF){
+          agregar_producto(&Productos,producto);
+    }
+    
+    fclose(p_archivo);    
+}
+
+void guardar_archivo_producto(void){
+    FILE *p_archivo;
+    PRODUCTO *p_actual=Productos.p_inicio;
+    p_archivo=fopen(F_NOM_PRODUCTOS,"w+");
+    while(p_actual !=NULL){
+        fprintf(p_archivo,"%d|%[^|]|%f|%d|%f",p_actual->id_producto,p_actual->nombre_producto,p_actual->precio_compra,
+                p_actual->existencia,p_actual->precio_venta);
+    }
+    fclose(p_archivo);    
+}
+
+void limpiar_lista_producto(LST_PRODUCTO *p_lista){
+     PRODUCTO *p_actual=p_lista->p_inicio;
+     
+    while(p_actual!=NULL){
+         p_lista->p_inicio=p_actual->p_siguiente;
+         free(p_actual);
+         p_actual=p_lista->p_inicio;
+    }
+    p_lista->p_fin=NULL;
+}
+
 /*****************************************************************************
  Funciones de detalle venta
 *****************************************************************************/
@@ -174,7 +258,7 @@ LST_DETALLE_VENTA entrada_detalle_venta(int num_venta){
         printf("Cantidad: ");
         scanf(" %d",&detalle_venta.cantidad);
         
-        detalle_venta.p_producto=NULL;
+        detalle_venta.p_producto=buscar_producto(Productos,detalle_venta.num_producto);
         detalle_venta.p_siguiente=NULL;
         
         agregar_detalle_venta(&lista_detalle_venta,detalle_venta);
@@ -269,14 +353,18 @@ void menu_productos() {
 		scanf(" %d", &opcion);
 		switch (opcion) {
 			case 1:
+                entrada_producto();
 				break;
 			case 2:
 				break;
 			case 3:
+                mostrar_busqueda_producto();
 				break;
 			case 4:
+                mostrar_lista_producto(Productos);
 				break;
 			case 5:
+                guardar_archivo_producto();
 				break;
 			case 6:
 				printf("Volviendo al menu principal");
@@ -312,6 +400,7 @@ void menu_ventas() {
 			case 2:
 				break;
 			case 3:
+                
 				break;
 			case 4:
                 mostrar_lista_venta(Ventas);
@@ -334,7 +423,8 @@ void menu_ventas() {
 *****************************************************************************/
 int main() {
 	int opcion;
-
+    
+    leer_archivo_producto();
 	do {
 		LIMPIAR_PANTALLA;
 		printf("Menu principal");
