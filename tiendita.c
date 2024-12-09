@@ -71,6 +71,7 @@ struct struct_lst_venta {//Definicion de struct_lst_venta
 
 LST_PRODUCTO Productos;
 LST_VENTA Ventas;
+LST_DETALLE_VENTA Detalles;
 
 /*****************************************************************************
  Funciones prototipo
@@ -94,6 +95,9 @@ void agregar_detalle_venta(LST_DETALLE_VENTA*,DETALLE_VENTA);
 LST_DETALLE_VENTA entrada_detalle_venta(int num_venta);
 void mostrar_detalle_venta(DETALLE_VENTA);
 void mostrar_lista_detalle_venta(LST_DETALLE_VENTA);
+void leer_archivo_detalle_venta(void);
+void limpiar_lista_detalle_venta(LST_DETALLE_VENTA*);
+void guardar_archivo_detalle_venta();
 
 /*** venta ***/
 VENTA *p_nueva_venta(void);
@@ -101,6 +105,10 @@ void agregar_venta(LST_VENTA*,VENTA);
 void entrada_venta();
 void mostrar_venta(VENTA);
 void mostrar_lista_venta(LST_VENTA);
+void leer_archivo_venta(void);
+void guardar_archivo_venta(void);
+void limpiar_lista_venta(LST_VENTA*);
+
 
 /*** menu productos***/
 void menu_productos();
@@ -284,6 +292,42 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
     }
 }
 
+void limpiar_lista_detalle_venta(LST_DETALLE_VENTA *p_lista){
+     DETALLE_VENTA *p_actual=p_lista->p_inicio;
+     
+    while(p_actual!=NULL){
+         p_lista->p_inicio=p_actual->p_siguiente;
+         free(p_actual);
+         p_actual=p_lista->p_inicio;
+    }
+    p_lista->p_fin=NULL;
+
+}
+
+void leer_archivo_detalle_venta(){
+    FILE *p_archivo;
+    DETALLE_VENTA detalle;
+    p_archivo=fopen(F_NOM_DETALLE_VENTAS,"r");
+    
+    limpiar_lista_detalle_venta(&Detalles);
+    
+    while(fscanf(p_archivo,"%d|%d|%d\n",&detalle.num_venta,&detalle.num_producto,&detalle.cantidad)!=EOF){
+          agregar_detalle_venta(&Detalles,detalle);
+    }
+    fclose(p_archivo); 
+}
+
+void guardar_archivo_detalle_venta(){
+    FILE *p_archivo;
+    DETALLE_VENTA *p_actual=Detalles.p_inicio;
+    p_archivo=fopen(F_NOM_DETALLE_VENTAS,"w+");
+    while(p_actual !=NULL){
+        fprintf(p_archivo,"%d|%d|%d\n",p_actual->num_venta,p_actual->num_producto,p_actual->cantidad);
+    }
+    fclose(p_archivo);   
+
+}
+
 /*****************************************************************************
  Funciones de venta
 *****************************************************************************/
@@ -334,6 +378,46 @@ void mostrar_lista_venta(LST_VENTA lista){
         p_actual=p_actual->p_siguiente;
     }
 }
+
+void leer_archivo_venta(){
+    
+    FILE *p_archivo;
+    VENTA venta;
+    p_archivo=fopen(F_NOM_VENTAS,"r");
+    
+    limpiar_lista_venta(&Ventas);
+    
+    while(fscanf(p_archivo,"%d|%d|%d\n",&venta.num_venta,&venta.fecha,&venta.hora)!=EOF){
+          agregar_venta(&Ventas,venta);
+    }
+    
+    fclose(p_archivo); 
+
+}
+void guardar_archivo_venta(){
+    FILE *p_archivo;
+    VENTA *p_actual=Ventas.p_inicio;
+    p_archivo=fopen(F_NOM_VENTAS,"w+");
+    while(p_actual !=NULL){
+        fprintf(p_archivo,"%d|%d|%d\n",p_actual->num_venta,p_actual->fecha,p_actual->hora);
+    }
+    fclose(p_archivo);   
+
+}
+
+void limpiar_lista_venta(LST_VENTA *p_lista){
+    VENTA *p_actual=p_lista->p_inicio;
+     
+    while(p_actual!=NULL){
+         p_lista->p_inicio=p_actual->p_siguiente;
+         free(p_actual);
+         p_actual=p_lista->p_inicio;
+    }
+    p_lista->p_fin=NULL;    
+
+}
+
+
 
 /*****************************************************************************
  Menu productos
