@@ -78,37 +78,165 @@ LST_DETALLE_VENTA Detalles;
 *****************************************************************************/
 
 /*** producto ***/
-PRODUCTO *p_nuevo_producto(void);
-void agregar_producto(LST_PRODUCTO*,PRODUCTO);
-void entrada_producto(void);
-void mostrar_producto(PRODUCTO);
-void mostrar_lista_producto(LST_PRODUCTO);
-PRODUCTO *buscar_producto(LST_PRODUCTO,int);
-void mostrar_busqueda_producto();
-void leer_archivo_producto(void);
-void guardar_archivo_producto(void);
-void limpiar_lista_producto(LST_PRODUCTO*);
+/*
+  Asigna memoria y lo castea como puntero
+*/
+PRODUCTO *p_nuevo_producto(void);//Back
+  
+/*
+  Agrega producto, recibe la lista
+  y el producto, despues lo agrega
+  Devuelve la lista con el producto
+*/ 
+void agregar_producto(LST_PRODUCTO*,PRODUCTO);//Back
+                                              
+/*
+  Pide al usuario el producto a agregar
+*/                                              
+void entrada_producto(void);//Front
 
-/*** detalle venta ***/
-DETALLE_VENTA *p_nuevo_detalle_venta(void);
-void agregar_detalle_venta(LST_DETALLE_VENTA*,DETALLE_VENTA);
-void entrada_detalle_venta(int num_venta);
-void mostrar_detalle_venta(DETALLE_VENTA);
-void mostrar_lista_detalle_venta(LST_DETALLE_VENTA);
-void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA,int);
-void leer_archivo_detalle_venta(void);
-void limpiar_lista_detalle_venta(LST_DETALLE_VENTA*);
-void guardar_archivo_detalle_venta();
+/*
+  Recibe el producto y muestra en pantalla
+*/
+void mostrar_producto(PRODUCTO);//Back
 
-/*** venta ***/
-VENTA *p_nueva_venta(void);
-void agregar_venta(LST_VENTA*,VENTA);
-void entrada_venta();
-void mostrar_venta(VENTA);
-void mostrar_lista_venta(LST_VENTA);
-void leer_archivo_venta(void);
-void guardar_archivo_venta(void);
-void limpiar_lista_venta(LST_VENTA*);
+/*
+  Recibe la lista y muestra en pantalla usando mostrar_producto
+*/
+void mostrar_lista_producto(LST_PRODUCTO);//Front
+
+/*
+  Recibe la lista y busca por el ID y regresa NULL si no encuentra, regresa el 
+  producto si lo encuentra
+*/
+PRODUCTO *buscar_producto(LST_PRODUCTO,int);//Back
+
+/*
+  Muestra en pantalla el producto buscado en la lista 
+*/
+void mostrar_busqueda_producto();//Front
+
+/*
+  Borra los archivos por el inicio para que se vacie
+*/ 
+void limpiar_lista_producto(LST_PRODUCTO*);//Back
+
+/*
+  Abre el archivo F_NOM_PRODUCTOS "Productos.txt" y lo carga en la lista
+  Primero limpia la lista existente (usa limpiar_lista_producto) y reemplaza 
+  (usando agregar_producto)
+  Cierra el archivo
+*/                                 
+void leer_archivo_producto(void)//Back
+
+/*
+  Carga el archivo F_NOM_PRODUCTOS "Productos.txt", lo crea si no existe y lo
+  sobreescribe si existe. Copia los elementos de la lista y los almacena en
+  el archivo
+  Cierra el archivo
+*/ 
+void guardar_archivo_producto(void);//Back
+
+/*****************************************************************************
+
+/*** detalle venta 
+*****************************************************************************/
+/*
+    Asigna memoria y lo castea como puntero
+*/ 
+DETALLE_VENTA *p_nuevo_detalle_venta(void);//Back
+
+/*
+    Agrega detalle de la venta, recibe la lista del detalle de la venta
+    devuelve la lista del detalle de la venta
+*/ 
+void agregar_detalle_venta(LST_DETALLE_VENTA*,DETALLE_VENTA);//Back
+
+/*
+    Pide al usuario que producto agregar
+*/ 
+void entrada_detalle_venta(int num_venta);//Front
+
+/*
+    Recibe el producto y muestra en pantalla
+*/ 
+void mostrar_detalle_venta(DETALLE_VENTA);//Back
+
+/*
+    Recibe la lista y muestra en pantalla usando mostrar_venta
+*/ 
+void mostrar_lista_detalle_venta(LST_DETALLE_VENTA);//Front
+/*
+    Recibe la lista y busca por el ID y regresa NULL si no encuentra, regresa el 
+    producto si lo encuentra
+*/ 
+void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA,int);//Back
+
+/*
+    Abre el archivo F_NOM_DETALLE_VENTAS "Detalles.txt" y lo carga en la lista
+  Primero limpia la lista existente (usa limpiar_lista_detalle_venta) y reemplaza 
+  (usando agregar_detalle_venta)
+  Cierra el archivo
+*/ 
+void leer_archivo_detalle_venta(void);//Back
+
+/*
+    Borra los archivos por el inicio para que se vacie
+*/ 
+void limpiar_lista_detalle_venta(LST_DETALLE_VENTA*);//
+
+/*
+    Carga el archivo F_NOM_DETALLE_VENTAS "Detalles.txt", lo crea si no existe y lo
+  sobreescribe si existe. Copia los elementos de la lista y los almacena en
+  el archivo
+  Cierra el archivo
+*/ 
+void guardar_archivo_detalle_venta();//Back
+
+/******************************************************************************
+****venta**** 
+******************************************************************************/
+/*
+    Asigna memoria y lo castea como puntero
+*/ 
+VENTA *p_nueva_venta(void);//
+
+/*
+    Agrega la venta, recibe la lista de la venta
+    devuelve la lista de la venta
+*/ 
+void agregar_venta(LST_VENTA*,VENTA);//
+
+/*
+    
+*/ 
+void entrada_venta();//
+
+/*
+    
+*/ 
+void mostrar_venta(VENTA);//
+
+/*
+    
+*/ 
+void mostrar_lista_venta(LST_VENTA);//
+
+/*
+    
+*/ 
+void leer_archivo_venta(void);//
+
+/*
+    
+*/ 
+void guardar_archivo_venta(void);//
+
+/*
+    
+*/ 
+void limpiar_lista_venta(LST_VENTA*);//
+
 
 
 /*** menu productos***/
