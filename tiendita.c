@@ -98,7 +98,7 @@ void entrada_producto(void);//Front
 /*
   Recibe el producto y muestra en pantalla
 */
-void mostrar_producto(PRODUCTO);//Back
+void mostrar_producto(PRODUCTO);//Front
 
 /*
   Recibe la lista y muestra en pantalla usando mostrar_producto
@@ -127,7 +127,7 @@ void limpiar_lista_producto(LST_PRODUCTO*);//Back
   (usando agregar_producto)
   Cierra el archivo
 */                                 
-void leer_archivo_producto(void)//Back
+void leer_archivo_producto(void);//Back
 
 /*
   Carga el archivo F_NOM_PRODUCTOS "Productos.txt", lo crea si no existe y lo
@@ -137,9 +137,24 @@ void leer_archivo_producto(void)//Back
 */ 
 void guardar_archivo_producto(void);//Back
 
+/*
+  Modificar
+*/ 
+void modificar_producto(void);//Front
+
+/*
+  Eliminar producto
+*/ 
+void eliminar_producto(void);//Front
+
+/*
+  Remover producto
+*/
+int remover_producto(LST_PRODUCTO*,int);
+
 /*****************************************************************************
 
-/*** detalle venta 
+    detalle venta 
 *****************************************************************************/
 /*
     Asigna memoria y lo castea como puntero
@@ -358,6 +373,62 @@ void limpiar_lista_producto(LST_PRODUCTO *p_lista){
     p_lista->p_fin=NULL;
 }
 
+void modificar_producto(void){
+    int id_producto;
+    PRODUCTO *p_producto;
+    
+    printf("Ingrese el id del producto a modificar: ");
+    scanf("%d",&id_producto);
+    p_producto=buscar_producto(Productos,id_producto);
+    if(p_producto!=NULL){
+        mostrar_producto(*p_producto);
+        printf("Nuevo nombre del producto: ");
+        scanf(" %50[^\n]",p_producto->nombre_producto);
+        printf("Nuevo precio de compra: ");
+        scanf(" %f",&(p_producto->precio_compra));
+        printf("Nueva cantidad de unidades en existencia: ");
+        scanf(" %d",&(p_producto->existencia));
+        printf("Nuevo precio de venta: ");
+        scanf(" %f",&(p_producto->precio_venta)); 
+        printf("El producto fue modificado correctamente\n");
+    }
+    else
+        printf("El producto no se ha encontrado o no se puede modificar\n");
+}
+
+void eliminar_producto(void){
+    int id_producto;
+    
+    mostrar_lista_producto(Productos);
+    printf("Ingrese el id del producto a eliminar: ");
+    scanf("%d",&id_producto);
+    
+    if(remover_producto(&Productos,id_producto)==1){
+        printf("Producto eliminado exitosamente\n");
+        mostrar_lista_producto(Productos);
+    }
+    else 
+        printf("Producto no encontrado\n");
+}
+
+int remover_producto(LST_PRODUCTO *p_lista,int id_producto){
+    PRODUCTO *p_actual=p_lista->p_inicio,*p_anterior=NULL;
+    while(p_actual!=NULL){
+        if(id_producto==p_actual->id_producto){
+            if(p_anterior==NULL)
+                p_lista->p_inicio=p_actual->p_siguiente;
+            else{
+                p_anterior->p_siguiente=p_actual->p_siguiente;
+            }    
+            free(p_actual);
+            return 1;
+        }
+    p_anterior=p_actual;
+    p_actual=p_actual->p_siguiente;
+    }
+    return 0;
+}
+
 /*****************************************************************************
  Funciones de detalle venta
 *****************************************************************************/
@@ -383,11 +454,7 @@ void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_ven
 
 void entrada_detalle_venta(int num_venta){
     DETALLE_VENTA detalle_venta;
-    //LST_DETALLE_VENTA lista_detalle_venta;
     char buffer[50];
-    
-    //lista_detalle_venta.p_inicio=NULL;
-    //lista_detalle_venta.p_fin=NULL;
     
     detalle_venta.num_venta=num_venta;
     do{                    
@@ -568,29 +635,30 @@ void menu_productos() {
 	int opcion;
 	do {
 		LIMPIAR_PANTALLA;
-		printf("Menu productos");
-		printf("\n1. Agregar producto");
-		printf("\n2. Borrar producto");
-		printf("\n3. Buscar producto");
-		printf("\n4. Listar productos");
-		printf("\n5. Guardar productos");
-		printf("\n6. Regresar a menu principal");
-		printf("\nIngresa tu opcion: ");
+		printf("Menu productos\n");
+		printf("1. Agregar producto.\n");
+		printf("2. Buscar producto por id.\n");
+		printf("3. Eliminar producto.\n");
+		printf("4. Listar productos\n");
+		printf("5. Modificar productos\n");
+		printf("6. Regresar a menu principal\n");
+		printf("Ingresa tu opcion: ");
 		scanf(" %d", &opcion);
 		switch (opcion) {
 			case 1:
                 entrada_producto();
 				break;
 			case 2:
+                mostrar_busqueda_producto();
 				break;
 			case 3:
-                mostrar_busqueda_producto();
+                eliminar_producto();
 				break;
 			case 4:
                 mostrar_lista_producto(Productos);
 				break;
 			case 5:
-                guardar_archivo_producto();
+                modificar_producto();
 				break;
 			case 6:
 				printf("Volviendo al menu principal\n");
@@ -610,14 +678,12 @@ void menu_ventas() {
 	int opcion;
 	do {
 		LIMPIAR_PANTALLA;
-		printf("Menu ventas");
-		printf("\n1. Agregar venta");
-		printf("\n2. Borrar venta");
-		printf("\n3. Buscar venta");
-		printf("\n4. Listar ventas");
-		printf("\n5. Generar Detalle Venta");
-		printf("\n6. Regresar a menu principal");
-		printf("\nIngresa tu opcion: ");
+		printf("Menu ventas\n");
+		printf("1. Agregar venta\n");
+		printf("2. Buscar venta por numero de nota\n");
+		printf("3. Listar ventas\n");
+		printf("4. Regresar a menu principal\n");
+		printf("Ingresa tu opcion: ");
 		scanf(" %d",&opcion);
 		switch (opcion) {
 			case 1:
@@ -626,14 +692,9 @@ void menu_ventas() {
 			case 2:
 				break;
 			case 3:
-                
-				break;
-			case 4:
                 mostrar_lista_venta(Ventas);
 				break;
-			case 5:
-				break;
-			case 6:
+			case 4:
 				printf("Volviendo al menu principal\n");
 				break;
 			default:
@@ -641,7 +702,7 @@ void menu_ventas() {
 				break;
 		}
 		PAUSA;
-	} while(opcion!=6);
+	} while(opcion!=4);
 }
 
 /*****************************************************************************
@@ -659,8 +720,7 @@ int main() {
 		printf("Menu principal");
 		printf("\n1. Menu Productos");
 		printf("\n2. Menu Ventas");
-		printf("\n3. Guardar todos los datos");
-		printf("\n4. Salir");
+		printf("\n3. Salir");
 		printf("\nOpcion: ");
 		scanf("%d", &opcion);
 
@@ -672,9 +732,6 @@ int main() {
 				menu_ventas();
 				break;
 			case 3:
-				//guardarDatos();
-				break;
-			case 4:
 				printf("Saliendo del programa. Tenga buen dia.\n");
 				PAUSA;
 				break;
@@ -683,7 +740,7 @@ int main() {
 				PAUSA;
 				break;
 		}
-	} while (opcion != 4);
+	} while (opcion != 3);
     
     guardar_archivo_producto();
     guardar_archivo_venta();
