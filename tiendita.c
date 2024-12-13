@@ -109,7 +109,7 @@ void mostrar_lista_producto(LST_PRODUCTO);//Front
   Recibe la lista y busca por el ID y regresa NULL si no encuentra, regresa el 
   producto si lo encuentra
 */
-PRODUCTO *buscar_producto(LST_PRODUCTO,int);//Back
+PRODUCTO *p_buscar_producto(LST_PRODUCTO,int);//Back
 
 /*
   Muestra en pantalla el producto buscado en la lista 
@@ -151,6 +151,11 @@ void eliminar_producto(void);//Front
   Remover producto
 */
 int remover_producto(LST_PRODUCTO*,int);
+
+/*
+  Lista los productos cuya existencia en tienda sea menor o igual a 5 piezas.
+*/
+void mostrar_producto_existencia_5(void);
 
 /*****************************************************************************
 
@@ -253,6 +258,19 @@ void guardar_archivo_venta(void);//
 void limpiar_lista_venta(LST_VENTA*);//
 
 
+/*
+  Recibe la lista y busca por el ID (num de nota) y regresa NULL si no 
+  encuentra, regresa el apuntador a la venta si la encuentra
+*/
+VENTA *p_buscar_venta(LST_VENTA,int);//Back
+
+/*
+  Solicita el ID de venta (num de nota) y si la encuentra la muestra en pantalla
+  con su detalle
+*/
+void mostrar_busqueda_nota_venta();//Front
+
+
 
 /*** menu productos***/
 void menu_productos();
@@ -305,7 +323,7 @@ void mostrar_producto(PRODUCTO producto){
            producto.existencia, producto.precio_venta);
 }
 
-PRODUCTO *buscar_producto(LST_PRODUCTO lista,int id_producto){
+PRODUCTO *p_buscar_producto(LST_PRODUCTO lista,int id_producto){
     PRODUCTO *p_actual=lista.p_inicio;
     
     while(p_actual!=NULL){
@@ -330,9 +348,19 @@ void mostrar_busqueda_producto(){
     int id_producto;
     printf("Ingrese el ID del producto: ");
     scanf("%d",&id_producto);
-    p_actual=buscar_producto(Productos,id_producto);
+    p_actual=p_buscar_producto(Productos,id_producto);
     if(p_actual!=NULL)  
         mostrar_producto(*p_actual);
+}
+
+void mostrar_producto_existencia_5(){
+    PRODUCTO *p_actual=Productos.p_inicio;
+    printf("La lista de productos con existencia menor o igual a cinco:\n");
+    while(p_actual!=NULL){
+        if(p_actual->existencia<=5)
+            mostrar_producto(*p_actual);
+        p_actual=p_actual->p_siguiente;
+    }
 }
 
 void leer_archivo_producto(void){
@@ -379,7 +407,7 @@ void modificar_producto(void){
     
     printf("Ingrese el id del producto a modificar: ");
     scanf("%d",&id_producto);
-    p_producto=buscar_producto(Productos,id_producto);
+    p_producto=p_buscar_producto(Productos,id_producto);
     if(p_producto!=NULL){
         mostrar_producto(*p_producto);
         printf("Nuevo nombre del producto: ");
@@ -463,7 +491,7 @@ void entrada_detalle_venta(int num_venta){
         printf("Cantidad: ");
         scanf(" %d",&detalle_venta.cantidad);
         
-        detalle_venta.p_producto=buscar_producto(Productos,detalle_venta.num_producto);
+        detalle_venta.p_producto=p_buscar_producto(Productos,detalle_venta.num_producto);
         detalle_venta.p_siguiente=NULL;
         
         agregar_detalle_venta(&Detalles,detalle_venta);
@@ -626,7 +654,28 @@ void limpiar_lista_venta(LST_VENTA *p_lista){
 
 }
 
+VENTA *p_buscar_venta(LST_VENTA lista,int num_venta){
+    VENTA *p_actual=lista.p_inicio;
+    
+    while(p_actual!=NULL){
+        if(p_actual->num_venta==num_venta)
+            return p_actual;
+        p_actual=p_actual->p_siguiente;
+    }
+    return NULL;
+}
 
+void mostrar_busqueda_nota_venta(){
+    int num_venta;
+    
+    printf("Ingrese el numero de nota de la venta que va a buscar: ");
+    scanf("%d",&num_venta);
+    VENTA *p_venta=p_buscar_venta(Ventas,num_venta);
+    if(p_venta!=NULL)
+       mostrar_venta(*p_venta); 
+    else
+        printf("No se encontro la nota\n");
+}
 
 /*****************************************************************************
  Menu productos
@@ -641,7 +690,8 @@ void menu_productos() {
 		printf("3. Eliminar producto.\n");
 		printf("4. Listar productos\n");
 		printf("5. Modificar productos\n");
-		printf("6. Regresar a menu principal\n");
+		printf("6. Listar productos con existencia menor o igual a cinco\n");
+		printf("7. Regresar a menu principal\n");
 		printf("Ingresa tu opcion: ");
 		scanf(" %d", &opcion);
 		switch (opcion) {
@@ -661,6 +711,9 @@ void menu_productos() {
                 modificar_producto();
 				break;
 			case 6:
+                mostrar_producto_existencia_5();
+				break;                
+			case 7:
 				printf("Volviendo al menu principal\n");
 				break;
 			default:
@@ -668,7 +721,7 @@ void menu_productos() {
 				break;
 		}
 		PAUSA;
-	} while (opcion != 6);
+	} while (opcion != 7);
 }
 
 /*****************************************************************************
@@ -690,6 +743,7 @@ void menu_ventas() {
                 entrada_venta();
 				break;
 			case 2:
+                mostrar_busqueda_nota_venta();
 				break;
 			case 3:
                 mostrar_lista_venta(Ventas);
