@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include<time.h>
-//in JICS
+//in master
 #define LIMPIAR_PANTALLA system("cls")
 #define PAUSA system("pause")
 #define F_NOM_PRODUCTOS "Productos.txt"
@@ -82,6 +82,7 @@ LST_DETALLE_VENTA Detalles;
 *****************************************************************************/
 int siguiente_dia(int dia);
 
+int pedir_fecha(char[101]);
 
 /*** producto ***/
 /*
@@ -759,11 +760,9 @@ void reporte_venta_dia_intervalo_nota(void){
     int fecha_inicio,fecha_fin,bandera_encabezado;
     float total;
     VENTA *p_actual;
-    
-    printf("Ingrese la fecha de inicio: ");
-    scanf("%d",&fecha_inicio);
-    printf("Ingrese la fecha de fin: ");
-    scanf("%d",&fecha_fin);
+
+	fecha_inicio=pedir_fecha("Ingrese la fecha de inicio: ");
+	fecha_fin=pedir_fecha("Ingrese la fecha de fin: ");
     
     for(int fecha=fecha_inicio;fecha<=fecha_fin;fecha=siguiente_dia(fecha)){
         bandera_encabezado=1; //Hay que mostrar el encabezado
@@ -889,6 +888,12 @@ int siguiente_dia(int dia){
     return aux;
 }
 
+int pedir_fecha(char impresion_usuario[101]){
+	int fecha;
+	printf(impresion_usuario);
+	scanf("%d",&fecha);
+	return fecha;
+}
 
 /*****************************************************************************
  Funcion principal
