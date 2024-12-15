@@ -313,24 +313,37 @@ void agregar_producto(LST_PRODUCTO *p_lista, PRODUCTO producto) {
 
 void entrada_producto(){
     PRODUCTO producto;
-    
-    printf("ID: ");
-    scanf(" %d",&producto.id_producto);
-    printf("Nombre del producto: ");
-    scanf(" %50[^\n]",producto.nombre_producto);
-    printf("Precio de compra: ");
-    scanf(" %f",&producto.precio_compra);
-    printf("Unidades en existencia: ");
-    scanf(" %d",&producto.existencia);
-    printf("Precio de venta: ");
-    scanf(" %f",&producto.precio_venta);
-    
-    agregar_producto(&Productos,producto);
+    PRODUCTO *p_producto_existente;
+	
+	do{
+	printf("ID: ");
+	scanf(" %d",&producto.id_producto);
+	
+	p_producto_existente = p_buscar_producto(Productos, producto.id_producto);
+	if(p_producto_existente != NULL)
+		 printf("Error: El ID %d ya existe. Por favor, ingrese un ID diferente.\n", producto.id_producto);
+	}while(p_producto_existente != NULL);
+		
+	printf("Nombre del producto: ");
+	scanf(" %100[^\n]",producto.nombre_producto);
+	printf("Precio de compra: ");
+	scanf(" %f",&producto.precio_compra);
+	printf("Unidades en existencia: ");
+	scanf(" %d",&producto.existencia);
+	printf("Precio de venta: ");
+	scanf(" %f",&producto.precio_venta);
+
+	agregar_producto(&Productos,producto);
+	printf("Producto agregado con exito.\n");
 }
 
 void mostrar_producto(PRODUCTO producto){
-    printf("%d\t%s\t%.2f\t%d\t%.2f\n", producto.id_producto, producto.nombre_producto, producto.precio_compra,
-           producto.existencia, producto.precio_venta);
+    printf("%-8d %-60s %-15.2f %-15d %.2f\n", 
+           producto.id_producto, 
+           producto.nombre_producto, 
+           producto.precio_compra, 
+           producto.existencia, 
+           producto.precio_venta);
 }
 
 PRODUCTO *p_buscar_producto(LST_PRODUCTO lista,int id_producto){
@@ -346,6 +359,13 @@ PRODUCTO *p_buscar_producto(LST_PRODUCTO lista,int id_producto){
 
 void mostrar_lista_producto(LST_PRODUCTO lista){
     PRODUCTO *p_actual=lista.p_inicio;
+	
+	printf("%-8s %-60s %-15s %-15s %s\n", 
+           "ID", 
+           "Nombre del producto", 
+           "Precio compra", 
+           "Existencia", 
+           "Precio venta");
     
     while(p_actual!=NULL) {
         mostrar_producto(*p_actual);
@@ -413,25 +433,56 @@ void limpiar_lista_producto(LST_PRODUCTO *p_lista){
 
 void modificar_producto(void){
     int id_producto;
+	int opcion;
     PRODUCTO *p_producto;
     
     printf("Ingrese el id del producto a modificar: ");
     scanf("%d",&id_producto);
     p_producto=p_buscar_producto(Productos,id_producto);
-    if(p_producto!=NULL){
-        mostrar_producto(*p_producto);
-        printf("Nuevo nombre del producto: ");
-        scanf(" %50[^\n]",p_producto->nombre_producto);
-        printf("Nuevo precio de compra: ");
-        scanf(" %f",&(p_producto->precio_compra));
-        printf("Nueva cantidad de unidades en existencia: ");
-        scanf(" %d",&(p_producto->existencia));
-        printf("Nuevo precio de venta: ");
-        scanf(" %f",&(p_producto->precio_venta)); 
-        printf("El producto fue modificado correctamente\n");
-    }
-    else
-        printf("El producto no se ha encontrado o no se puede modificar\n");
+	if (p_producto != NULL) {
+		do {
+			LIMPIAR_PANTALLA;
+			printf("Seleccione que desea modificar:\n");
+			printf("1. Nombre del producto\n");
+			printf("2. Precio de compra\n");
+			printf("3. Existencia\n");
+			printf("4. Precio de venta\n");
+			printf("5. Volver al menu productos\n");
+			printf("Opcion: ");
+			scanf("%d", &opcion);
+
+			switch (opcion) {
+				case 1:
+					printf("Ingrese el nuevo nombre del producto: ");
+					scanf(" %[^\n]", p_producto->nombre_producto);
+					break;
+				case 2:
+					printf("Ingrese el nuevo precio de compra del producto: ");
+					scanf(" %f", &p_producto->precio_compra);
+					break;
+				case 3:
+					printf("Ingrese la nueva existencia del producto: ");
+					scanf(" %d", &p_producto->existencia);
+					break;
+				case 4:
+					printf("Ingrese el nuevo precio de venta del producto: ");
+					scanf(" %f", &p_producto->precio_venta);
+					break;
+				case 5:
+					printf("Volviendo al menu productos\n");
+					break;
+				default:
+					printf("Opcion no valida.\n");
+					return;
+			}
+			if (opcion >= 1 && opcion <= 4) {
+				printf("Producto modificado con exito.\n");
+				PAUSA;
+			}
+		} while(opcion!=5);
+	} else {
+		printf("Producto no encontrado.\n");
+	}
 }
 
 void eliminar_producto(void){
