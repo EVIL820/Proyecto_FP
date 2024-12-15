@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include<time.h>
 //in JICS
 #define LIMPIAR_PANTALLA system("cls")
 #define PAUSA system("pause")
@@ -76,6 +77,11 @@ LST_DETALLE_VENTA Detalles;
 /*****************************************************************************
  Funciones prototipo
 *****************************************************************************/
+/*****************************************************************************
+ Manejo de fechas y horas
+*****************************************************************************/
+int siguiente_dia(int dia);
+
 
 /*** producto ***/
 /*
@@ -213,6 +219,8 @@ void limpiar_lista_detalle_venta(LST_DETALLE_VENTA*);//
 */ 
 void guardar_archivo_detalle_venta();//Back
 
+float calcular_total_detalle_venta(LST_PRODUCTO,LST_DETALLE_VENTA,int);//Back
+
 /******************************************************************************
 ****venta**** 
 ******************************************************************************/
@@ -277,6 +285,8 @@ void menu_productos();
 
 /*** menu ventas***/
 void menu_ventas();
+
+void reporte_venta_dia_intervalo_nota(void);//Front
 
 /*****************************************************************************
 Funciones de producto
@@ -564,6 +574,23 @@ void guardar_archivo_detalle_venta(){
 
 }
 
+float calcular_total_detalle_venta(LST_PRODUCTO lista_productos,LST_DETALLE_VENTA lista_ventas,int num_venta){
+    DETALLE_VENTA *p_actual=lista_ventas.p_inicio;
+    PRODUCTO *p_producto;
+    float total=0.0;
+    
+    while(p_actual!=NULL){
+        if(p_actual->num_venta==num_venta){
+            p_producto=p_buscar_producto(lista_productos,p_actual->num_producto);
+            if(p_producto!=NULL)
+                total=total+p_actual->cantidad*p_producto->precio_venta;
+        }
+        
+        p_actual=p_actual->p_siguiente;
+    }
+    return total;
+}
+
 /*****************************************************************************
  Funciones de venta
 *****************************************************************************/
@@ -677,6 +704,34 @@ void mostrar_busqueda_nota_venta(){
         printf("No se encontro la nota\n");
 }
 
+void reporte_venta_dia_intervalo_nota(void){
+    int fecha_inicio,fecha_fin,bandera_encabezado;
+    float total;
+    VENTA *p_actual;
+    
+    printf("Ingrese la fecha de inicio: ");
+    scanf("%d",&fecha_inicio);
+    printf("Ingrese la fecha de fin: ");
+    scanf("%d",&fecha_fin);
+    
+    for(int fecha=fecha_inicio;fecha<=fecha_fin;fecha=siguiente_dia(fecha)){
+        bandera_encabezado=1; //Hay que mostrar el encabezado
+        p_actual=Ventas.p_inicio;
+        while(p_actual!=NULL){
+            if(p_actual->fecha==fecha){
+                if(bandera_encabezado==1){
+                    printf("FECHA:%d\n",fecha);
+                    bandera_encabezado=0;
+                }
+                total=calcular_total_detalle_venta(Productos,Detalles,p_actual->num_venta);
+                printf("%d %f\n",p_actual->num_venta,total);
+            }
+            
+            p_actual=p_actual->p_siguiente;
+        }
+    }    
+}
+
 /*****************************************************************************
  Menu productos
 *****************************************************************************/
@@ -725,7 +780,7 @@ void menu_productos() {
 }
 
 /*****************************************************************************
- Menu productos_venta
+ Menu ventas
 *****************************************************************************/
 void menu_ventas() {
 	int opcion;
@@ -735,7 +790,8 @@ void menu_ventas() {
 		printf("1. Agregar venta\n");
 		printf("2. Buscar venta por numero de nota\n");
 		printf("3. Listar ventas\n");
-		printf("4. Regresar a menu principal\n");
+		printf("4. Total de ventas por dia, por intervalo de fechas y con numero de nota\n");
+		printf("5. Regresar a menu principal\n");
 		printf("Ingresa tu opcion: ");
 		scanf(" %d",&opcion);
 		switch (opcion) {
@@ -749,6 +805,9 @@ void menu_ventas() {
                 mostrar_lista_venta(Ventas);
 				break;
 			case 4:
+                reporte_venta_dia_intervalo_nota();
+				break;                
+			case 5:
 				printf("Volviendo al menu principal\n");
 				break;
 			default:
@@ -756,8 +815,29 @@ void menu_ventas() {
 				break;
 		}
 		PAUSA;
-	} while(opcion!=4);
+	} while(opcion!=5);
 }
+
+/*****************************************************************************
+ Manejo de fechas y horas
+*****************************************************************************/
+int siguiente_dia(int dia){
+    int aux=0;
+    struct tm fecha={
+        .tm_year=dia/10000-1900,
+        .tm_mon=((dia%10000)/100)-1,
+        .tm_mday=dia%100
+    };
+    time_t segundos_fecha=mktime(&fecha);
+    
+    segundos_fecha+=24*60*60;
+    fecha=*localtime(&segundos_fecha);
+    aux+=(fecha.tm_year+1900)*10000;
+    aux+=(fecha.tm_mon+1)*100;
+    aux+=fecha.tm_mday;
+    return aux;
+}
+
 
 /*****************************************************************************
  Funcion principal
