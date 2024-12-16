@@ -82,7 +82,15 @@ LST_DETALLE_VENTA Detalles;
 *****************************************************************************/
 int siguiente_dia(int dia);
 
-int pedir_fecha(char[101]);
+int pedir_fecha(char*);
+
+int pedir_hora(char*);
+
+int reestructura_fecha (int);
+
+int validar_fecha(int,int,int);
+
+char *formatear_fecha(int,char[],int);
 
 /*** producto ***/
 /*
@@ -544,16 +552,27 @@ void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_ven
 
 void entrada_detalle_venta(int num_venta){
     DETALLE_VENTA detalle_venta;
+    int existencia_ok;
     char buffer[50];
     
     detalle_venta.num_venta=num_venta;
     do{                    
-        printf("Numero de producto: ");
-        scanf(" %d",&detalle_venta.num_producto);
-        printf("Cantidad: ");
-        scanf(" %d",&detalle_venta.cantidad);
-        
-        detalle_venta.p_producto=p_buscar_producto(Productos,detalle_venta.num_producto);
+        do{
+            existencia_ok=0;
+            printf("Numero de producto: ");
+            scanf(" %d",&detalle_venta.num_producto);
+            printf("Cantidad: ");
+            scanf(" %d",&detalle_venta.cantidad);
+            
+            detalle_venta.p_producto=p_buscar_producto(Productos,detalle_venta.num_producto);
+            if (detalle_venta.cantidad<=detalle_venta.p_producto->existencia){
+                detalle_venta.p_producto->existencia-=detalle_venta.cantidad;
+                existencia_ok=1;
+            }else{
+                printf("Solo hay %d existencias para el producto\nPor favor intente de nuevo\n",
+                       detalle_venta.p_producto->existencia);
+            }
+        }while(existencia_ok==0);
         detalle_venta.p_siguiente=NULL;
         
         agregar_detalle_venta(&Detalles,detalle_venta);
@@ -633,9 +652,9 @@ float calcular_total_detalle_venta(LST_PRODUCTO lista_productos,LST_DETALLE_VENT
     
     while(p_actual!=NULL){
         if(p_actual->num_venta==num_venta){
-            p_producto=p_buscar_producto(lista_productos,p_actual->num_producto);
-            if(p_producto!=NULL)
-                total=total+p_actual->cantidad*p_producto->precio_venta;
+            //p_producto=p_buscar_producto(lista_productos,p_actual->num_producto);
+            if(p_actual->p_producto!=NULL)
+                total=total+p_actual->cantidad*p_actual->p_producto->precio_venta;
         }
         
         p_actual=p_actual->p_siguiente;
@@ -671,17 +690,18 @@ void entrada_venta(){
     
     printf("Numero de venta: ");
     scanf(" %d",&venta.num_venta);
-    printf("Fecha de venta: ");
-    scanf(" %d",&venta.fecha);
-    printf("Hora de venta: ");
-    scanf(" %d",&venta.hora);
+    venta.fecha=pedir_fecha("Fecha de venta en formato (yyyy-mm-dd): ");
+    venta.hora=pedir_hora("Hora de venta en formato (hh:mm):");
+    //printf();
+    //scanf(" %d",&venta.hora);
     
     entrada_detalle_venta(venta.num_venta);
     agregar_venta(&Ventas,venta);
 }
 
 void mostrar_venta(VENTA venta){
-    printf("%d\t%d\t%d\n", venta.num_venta, venta.fecha, venta.hora);
+    char buffer[20];
+    printf("%d\t%s\t%d\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), venta.hora);
     mostrar_lista_detalle_venta_por_num(Detalles,venta.num_venta);
 }
 
@@ -759,10 +779,11 @@ void mostrar_busqueda_nota_venta(){
 void reporte_venta_dia_intervalo_nota(void){
     int fecha_inicio,fecha_fin,bandera_encabezado;
     float total;
+    char buffer[20];
     VENTA *p_actual;
 
-	fecha_inicio=pedir_fecha("Ingrese la fecha de inicio: ");
-	fecha_fin=pedir_fecha("Ingrese la fecha de fin: ");
+	fecha_inicio=pedir_fecha("Ingrese la fecha de inicio en formato (yyyy-mm-dd): ");
+	fecha_fin=pedir_fecha("Ingrese la fecha de fin en formato (yyyy-mm-dd): ");
     
     for(int fecha=fecha_inicio;fecha<=fecha_fin;fecha=siguiente_dia(fecha)){
         bandera_encabezado=1; //Hay que mostrar el encabezado
@@ -770,11 +791,11 @@ void reporte_venta_dia_intervalo_nota(void){
         while(p_actual!=NULL){
             if(p_actual->fecha==fecha){
                 if(bandera_encabezado==1){
-                    printf("FECHA:%d\n",fecha);
+                    printf("FECHA:\t%s\n",formatear_fecha(fecha,buffer,20));
                     bandera_encabezado=0;
                 }
                 total=calcular_total_detalle_venta(Productos,Detalles,p_actual->num_venta);
-                printf("%d %f\n",p_actual->num_venta,total);
+                printf("%3d\t$%.2f\n",p_actual->num_venta,total);
             }
             
             p_actual=p_actual->p_siguiente;
@@ -874,9 +895,14 @@ void menu_ventas() {
 int siguiente_dia(int dia){
     int aux=0;
     struct tm fecha={
+        .tm_sec=0,
+        .tm_min=0,
+        .tm_hour=0,
         .tm_year=dia/10000-1900,
         .tm_mon=((dia%10000)/100)-1,
-        .tm_mday=dia%100
+        .tm_mday=dia%100,
+        .tm_yday=0,
+        .tm_isdst=0
     };
     time_t segundos_fecha=mktime(&fecha);
     
@@ -888,11 +914,94 @@ int siguiente_dia(int dia){
     return aux;
 }
 
-int pedir_fecha(char impresion_usuario[101]){
-	int fecha;
-	printf(impresion_usuario);
-	scanf("%d",&fecha);
-	return fecha;
+int pedir_hora(char *p_impresion_usuario){
+    int horas,minutos,valido;
+    do{
+        printf(p_impresion_usuario);
+        scanf("%d:%d",&horas,&minutos);
+        //validar horas y minutos
+        if(horas>=0 && horas<60 && minutos>=0 && minutos<60)
+            valido=1;
+        else{
+            valido=0;
+            printf("El rango de horas es de 0 a 23 y el de minutos de 0 a 59\n");
+        }
+    }while(valido==0);
+    return horas*100+minutos;
+}
+
+int pedir_fecha(char *p_impresion_usuario){
+    int year, mon, mday,aux;
+    do{
+        printf(p_impresion_usuario);
+        scanf("%d-%d-%d", &year,&mon,&mday);
+        aux=validar_fecha(year, mon, mday);
+        if(aux==0)
+           printf("La fecha es invalida, vuelva a intentar\n"); 
+    }while(aux==0);   
+    return (year*10000)+(mon*100)+mday;
+}
+
+int validar_fecha(int year, int mon, int mday){
+    int fecha;
+    if(year<=0)
+        return 0;
+    if(mon<1 || mon>12)
+        return 0;
+    if(mday<1 || mday>31)
+        return 0;
+    fecha=(year*10000)+(mon*100)+mday;
+    
+    if(fecha == reestructura_fecha(fecha))
+        return 1;
+    return 0;
+}
+
+
+int reestructura_fecha (int fecha){
+    int year, mon, mday;
+    struct tm aux={
+        .tm_sec=0,
+        .tm_min=0,
+        .tm_hour=0,
+        .tm_mday=0,
+        .tm_mon=0,
+        .tm_year=0,
+        .tm_yday=0,
+        .tm_isdst=0
+    };
+    time_t segundos_fecha;
+    year = (fecha/10000)-1900;
+    mon = ((fecha%10000)/100)-1;
+    mday = fecha%100;
+    
+    aux.tm_year = year;
+    aux.tm_mon = mon;
+    aux.tm_mday = mday;
+    
+    segundos_fecha=mktime(&aux);
+    aux=*localtime(&segundos_fecha);
+    year=aux.tm_year+1900;
+    mon=aux.tm_mon+1;
+    mday=aux.tm_mday;
+    fecha=(year*10000)+(mon*100)+mday;
+    
+    return fecha;   
+}
+
+char *formatear_fecha(int fecha,char buffer[],int tam_buffer){
+    struct tm tm_fecha={
+        .tm_sec=0,
+        .tm_min=0,
+        .tm_hour=0,
+        .tm_mday=fecha%100,
+        .tm_mon=((fecha%10000)/100)-1,
+        .tm_year=(fecha/10000)-1900,
+        .tm_yday=0,
+        .tm_isdst=0        
+    };
+    strftime(buffer,tam_buffer,"%Y-%m-%d",&tm_fecha);
+    return buffer;
 }
 
 /*****************************************************************************
