@@ -92,6 +92,8 @@ int validar_fecha(int,int,int);
 
 char *formatear_fecha(int,char[],int);
 
+char *formatear_hora(int,char[],int);
+
 /*** producto ***/
 /*
   Asigna memoria y lo castea como puntero
@@ -587,7 +589,8 @@ void entrada_detalle_venta(int num_venta){
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
-    printf(" %-20d\t%-20d\t%-20d\n", detalle_venta.num_venta, detalle_venta.num_producto, detalle_venta.cantidad);
+    printf(" %-20d\t%-2d:%-40s\t%-20d\n", detalle_venta.num_venta,
+            detalle_venta.num_producto,detalle_venta.p_producto->nombre_producto,detalle_venta.cantidad);
 }
 
 void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
@@ -602,7 +605,7 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
 void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA lista,int num_venta){
     DETALLE_VENTA *p_actual=lista.p_inicio;
     
-	printf("Numero de venta:\tNumero de producto:\tCantidad:\n");
+	printf("Numero de venta:\tNumero y nombre de producto:\t\t\tCantidad:\n");
 	
     while(p_actual!=NULL) {
         if (p_actual->num_venta==num_venta)
@@ -631,6 +634,7 @@ void leer_archivo_detalle_venta(){
     limpiar_lista_detalle_venta(&Detalles);
     
     while(fscanf(p_archivo,"%d|%d|%d\n",&detalle.num_venta,&detalle.num_producto,&detalle.cantidad)!=EOF){
+        detalle.p_producto=p_buscar_producto(Productos,detalle.num_producto);
           agregar_detalle_venta(&Detalles,detalle);
     }
     fclose(p_archivo); 
@@ -704,8 +708,9 @@ void entrada_venta(){
 
 void mostrar_venta(VENTA venta){
     char buffer[20];
+    char buffer2[20];
     printf("Numero de venta:\tFecha:\t\t\tHora:\n");
-    printf(" %d\t\t\t%s\t\t%d\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), venta.hora);
+    printf(" %d\t\t\t%s\t\t%s\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), formatear_hora(venta.hora,buffer2,sizeof(buffer2)));
     mostrar_lista_detalle_venta_por_num(Detalles,venta.num_venta);
 }
 
@@ -923,7 +928,7 @@ void menu_ventas() {
 				break;
 		}
 		PAUSA;
-	} while(opcion!=5);
+	} while(opcion!=6);
 }
 
 /*****************************************************************************
@@ -1024,6 +1029,14 @@ int reestructura_fecha (int fecha){
     fecha=(year*10000)+(mon*100)+mday;
     
     return fecha;   
+}
+
+char *formatear_hora(int hora,char buffer[],int tam_buffer){
+    int horas, minutos; 
+    horas=hora/100;
+    minutos=hora%100;
+    sprintf(buffer,"%02d:%02d",horas,minutos);
+    return buffer;
 }
 
 char *formatear_fecha(int fecha,char buffer[],int tam_buffer){
