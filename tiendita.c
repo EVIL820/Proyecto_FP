@@ -297,6 +297,8 @@ void menu_ventas();
 
 void reporte_venta_dia_intervalo_nota(void);//Front
 
+void total_general_venta(LST_VENTA);//Front
+
 /*****************************************************************************
 Funciones de producto
 *****************************************************************************/
@@ -585,8 +587,7 @@ void entrada_detalle_venta(int num_venta){
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
-    printf(" %d\t%d\t%d\n", detalle_venta.num_venta, detalle_venta.num_producto,
-        detalle_venta.cantidad);
+    printf(" %-20d\t%-20d\t%-20d\n", detalle_venta.num_venta, detalle_venta.num_producto, detalle_venta.cantidad);
 }
 
 void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
@@ -601,6 +602,8 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
 void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA lista,int num_venta){
     DETALLE_VENTA *p_actual=lista.p_inicio;
     
+	printf("Numero de venta:\tNumero de producto:\tCantidad:\n");
+	
     while(p_actual!=NULL) {
         if (p_actual->num_venta==num_venta)
             mostrar_detalle_venta(*p_actual);
@@ -652,9 +655,9 @@ float calcular_total_detalle_venta(LST_PRODUCTO lista_productos,LST_DETALLE_VENT
     
     while(p_actual!=NULL){
         if(p_actual->num_venta==num_venta){
-            //p_producto=p_buscar_producto(lista_productos,p_actual->num_producto);
+            p_producto=p_buscar_producto(lista_productos,p_actual->num_producto);
             if(p_actual->p_producto!=NULL)
-                total=total+p_actual->cantidad*p_actual->p_producto->precio_venta;
+                total=total+p_actual->cantidad*(p_producto->precio_venta);
         }
         
         p_actual=p_actual->p_siguiente;
@@ -701,13 +704,16 @@ void entrada_venta(){
 
 void mostrar_venta(VENTA venta){
     char buffer[20];
-    printf("%d\t%s\t%d\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), venta.hora);
+    printf("Numero de venta:\tFecha:\t\t\tHora:\n");
+    printf(" %d\t\t\t%s\t\t%d\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), venta.hora);
     mostrar_lista_detalle_venta_por_num(Detalles,venta.num_venta);
 }
 
 void mostrar_lista_venta(LST_VENTA lista){
     VENTA *p_actual=lista.p_inicio;
-    
+   
+   //printf("Numero de venta:\tFecha:\t\t\tHora:\n");
+
     while(p_actual!=NULL) {
         mostrar_venta(*p_actual);
         p_actual=p_actual->p_siguiente;
@@ -802,7 +808,34 @@ void reporte_venta_dia_intervalo_nota(void){
         }
     }    
 }
-
+void total_general_venta(LST_VENTA lista){
+    int fecha_inicio,fecha_fin,bandera_encabezado;
+    float total, total_total=0.0;
+    char buffer[20];
+	VENTA *p_actual;
+	
+	printf("TOTAL de ventas \n");
+	fecha_inicio=lista.p_inicio->fecha;
+	fecha_fin=lista.p_fin->fecha;
+	
+	for(int fecha=fecha_inicio;fecha<=fecha_fin;fecha=siguiente_dia(fecha)){
+		bandera_encabezado=1; //Hay que mostrar el encabezado
+		p_actual=Ventas.p_inicio;
+		while(p_actual!=NULL){
+			if(p_actual->fecha==fecha){
+				if(bandera_encabezado==1){
+					printf("FECHA:\t%s\n",formatear_fecha(fecha,buffer,20));
+					bandera_encabezado=0;
+				}
+				total=calcular_total_detalle_venta(Productos,Detalles,p_actual->num_venta);
+				printf("%3d\t$%.2f\n",p_actual->num_venta,total);
+				total_total=total_total+total;
+			}
+			p_actual=p_actual->p_siguiente;
+		}
+	}
+	printf("TOTAL: \n$%.2lf\n", total_total);
+}
 /*****************************************************************************
  Menu productos
 *****************************************************************************/
@@ -862,7 +895,8 @@ void menu_ventas() {
 		printf("2. Buscar venta por numero de nota\n");
 		printf("3. Listar ventas\n");
 		printf("4. Total de ventas por dia, por intervalo de fechas y con numero de nota\n");
-		printf("5. Regresar a menu principal\n");
+		printf("5. Total de ventas general\n");
+		printf("6. Regresar a menu principal\n");
 		printf("Ingresa tu opcion: ");
 		scanf(" %d",&opcion);
 		switch (opcion) {
@@ -879,6 +913,9 @@ void menu_ventas() {
                 reporte_venta_dia_intervalo_nota();
 				break;                
 			case 5:
+				total_general_venta(Ventas);
+				break;
+			case 6:
 				printf("Volviendo al menu principal\n");
 				break;
 			default:
