@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<time.h>
+#include <time.h>
 //in master
 #define LIMPIAR_PANTALLA system("cls")
 #define PAUSA system("pause")
@@ -589,7 +589,7 @@ void entrada_detalle_venta(int num_venta){
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
-    printf(" %-20d\t%-2d:%-40s\t%-20d\n", detalle_venta.num_venta,
+    printf(" %-20d\t%-2d:%-60s\t%-20d\n", detalle_venta.num_venta,
             detalle_venta.num_producto,detalle_venta.p_producto->nombre_producto,detalle_venta.cantidad);
 }
 
@@ -605,7 +605,7 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
 void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA lista,int num_venta){
     DETALLE_VENTA *p_actual=lista.p_inicio;
     
-	printf("Numero de venta:\tNumero y nombre de producto:\t\t\tCantidad:\n");
+	printf("Numero de venta:\tNumero y nombre de producto:\t\t\t\t\tCantidad:\n");
 	
     while(p_actual!=NULL) {
         if (p_actual->num_venta==num_venta)
@@ -694,23 +694,32 @@ void agregar_venta(LST_VENTA *p_lista, VENTA venta) {
 
 void entrada_venta(){
     VENTA venta;
-    
-    printf("Numero de venta: ");
-    scanf(" %d",&venta.num_venta);
-    venta.fecha=pedir_fecha("Fecha de venta en formato (yyyy-mm-dd): ");
-    venta.hora=pedir_hora("Hora de venta en formato (hh:mm):");
-    //printf();
-    //scanf(" %d",&venta.hora);
-    
+    VENTA *p_venta_existente;
+
+    do {
+        printf("Numero de venta: ");
+        scanf(" %d", &venta.num_venta);
+
+        p_venta_existente = p_buscar_venta(Ventas, venta.num_venta);
+        if (p_venta_existente != NULL)
+            printf("Error: El numero de venta %d ya existe. Por favor, ingrese un numero diferente.\n", venta.num_venta);
+    } while (p_venta_existente != NULL);
+
+    venta.fecha = pedir_fecha("Fecha de venta en formato (yyyy-mm-dd): ");
+    venta.hora = pedir_hora("Hora de venta en formato (hh:mm):");
+
     entrada_detalle_venta(venta.num_venta);
-    agregar_venta(&Ventas,venta);
+    agregar_venta(&Ventas, venta);
+
+    printf("Venta agregada con exito.\n");
 }
+
 
 void mostrar_venta(VENTA venta){
     char buffer[20];
     char buffer2[20];
-    printf("Numero de venta:\tFecha:\t\t\tHora:\n");
-    printf(" %d\t\t\t%s\t\t%s\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), formatear_hora(venta.hora,buffer2,sizeof(buffer2)));
+    printf("Numero de venta:\tFecha:\t\t\t\t\t\t\t\tHora:\n");
+printf(" %-20d\t%-60s\t%-20s\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), formatear_hora(venta.hora,buffer2,sizeof(buffer2)));
     mostrar_lista_detalle_venta_por_num(Detalles,venta.num_venta);
 }
 
@@ -813,34 +822,31 @@ void reporte_venta_dia_intervalo_nota(void){
         }
     }    
 }
-void total_general_venta(LST_VENTA lista){
-    int fecha_inicio,fecha_fin,bandera_encabezado;
-    float total, total_total=0.0;
+
+void total_general_venta(LST_VENTA lista) {
+    VENTA *p_actual = lista.p_inicio;
+    int fecha_anterior = 0;
+    float total, total_total = 0.0;
     char buffer[20];
-	VENTA *p_actual;
-	
-	printf("TOTAL de ventas \n");
-	fecha_inicio=lista.p_inicio->fecha;
-	fecha_fin=lista.p_fin->fecha;
-	
-	for(int fecha=fecha_inicio;fecha<=fecha_fin;fecha=siguiente_dia(fecha)){
-		bandera_encabezado=1; //Hay que mostrar el encabezado
-		p_actual=Ventas.p_inicio;
-		while(p_actual!=NULL){
-			if(p_actual->fecha==fecha){
-				if(bandera_encabezado==1){
-					printf("FECHA:\t%s\n",formatear_fecha(fecha,buffer,20));
-					bandera_encabezado=0;
-				}
-				total=calcular_total_detalle_venta(Productos,Detalles,p_actual->num_venta);
-				printf("%3d\t$%.2f\n",p_actual->num_venta,total);
-				total_total=total_total+total;
-			}
-			p_actual=p_actual->p_siguiente;
-		}
-	}
-	printf("TOTAL: \n$%.2lf\n", total_total);
+
+    printf("TOTAL de ventas \n");
+
+    while (p_actual != NULL) {
+        if (p_actual->fecha != fecha_anterior) {
+            fecha_anterior = p_actual->fecha;
+            printf("FECHA:\t%s\n", formatear_fecha(p_actual->fecha, buffer, 20));
+        }
+		
+		total = calcular_total_detalle_venta(Productos, Detalles, p_actual->num_venta);
+        printf("%3d\t$%.2f\n", p_actual->num_venta, total);
+        total_total += total;
+
+        p_actual = p_actual->p_siguiente;
+    }
+
+    printf("TOTAL: \n$%.2lf\n", total_total);
 }
+
 /*****************************************************************************
  Menu productos
 *****************************************************************************/
