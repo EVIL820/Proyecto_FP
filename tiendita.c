@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <conio.h>
 //in master
 #define LIMPIAR_PANTALLA system("cls")
 #define PAUSA system("pause")
@@ -554,38 +555,41 @@ void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_ven
     }    
 }
 
-void entrada_detalle_venta(int num_venta){
+void entrada_detalle_venta(int num_venta) {
     DETALLE_VENTA detalle_venta;
     int existencia_ok;
-    char buffer[50];
+    char tecla;
     
-    detalle_venta.num_venta=num_venta;
-    do{                    
-        do{
-            existencia_ok=0;
+    detalle_venta.num_venta = num_venta;
+
+    do {                    
+        do {
+            existencia_ok = 0;
             printf("Numero de producto: ");
-            scanf(" %d",&detalle_venta.num_producto);
+            scanf(" %d", &detalle_venta.num_producto);
             printf("Cantidad: ");
-            scanf(" %d",&detalle_venta.cantidad);
+            scanf(" %d", &detalle_venta.cantidad);
             
-            detalle_venta.p_producto=p_buscar_producto(Productos,detalle_venta.num_producto);
-            if (detalle_venta.cantidad<=detalle_venta.p_producto->existencia){
-                detalle_venta.p_producto->existencia-=detalle_venta.cantidad;
-                existencia_ok=1;
-            }else{
+            detalle_venta.p_producto = p_buscar_producto(Productos, detalle_venta.num_producto);
+            if (detalle_venta.cantidad <= detalle_venta.p_producto->existencia) {
+                detalle_venta.p_producto->existencia -= detalle_venta.cantidad;
+                existencia_ok = 1;
+            } else {
                 printf("Solo hay %d existencias para el producto\nPor favor intente de nuevo\n",
                        detalle_venta.p_producto->existencia);
             }
-        }while(existencia_ok==0);
-        detalle_venta.p_siguiente=NULL;
+        } while (existencia_ok == 0);
+
+        detalle_venta.p_siguiente = NULL;
+        agregar_detalle_venta(&Detalles, detalle_venta);
         
-        agregar_detalle_venta(&Detalles,detalle_venta);
+        printf("Presione [Enter] para agregar otro producto o [ESC] para terminar...\n");
         
-        printf("Escriba fin para terminar, cualquier otra cosa para agregar un "
-                "producto adicional\n");
-        scanf(" %s",buffer);
-    }while(strcmp("fin",buffer)!=0);
-    //return lista_detalle_venta;
+        do {
+            tecla = getch();
+        } while (tecla != 13 && tecla != 27);
+        
+    } while (tecla != 27);
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
@@ -706,7 +710,7 @@ void entrada_venta(){
     } while (p_venta_existente != NULL);
 
     venta.fecha = pedir_fecha("Fecha de venta en formato (yyyy-mm-dd): ");
-    venta.hora = pedir_hora("Hora de venta en formato (hh:mm):");
+    venta.hora = pedir_hora("Hora de venta en formato (hh:mm): ");
 
     entrada_detalle_venta(venta.num_venta);
     agregar_venta(&Ventas, venta);
@@ -851,7 +855,7 @@ void total_general_venta(LST_VENTA lista) {
  Menu productos
 *****************************************************************************/
 void menu_productos() {
-	int opcion;
+	char opcion;
 	do {
 		LIMPIAR_PANTALLA;
 		printf("Menu productos\n");
@@ -862,28 +866,30 @@ void menu_productos() {
 		printf("5. Modificar productos\n");
 		printf("6. Listar productos con existencia menor o igual a cinco\n");
 		printf("7. Regresar a menu principal\n");
-		printf("Ingresa tu opcion: ");
-		scanf(" %d", &opcion);
+		printf("Ingresa tu opcion: \n");
+		//scanf(" %d", &opcion);
+		
+		opcion = getch();
 		switch (opcion) {
-			case 1:
+			case '1':
                 entrada_producto();
 				break;
-			case 2:
+			case '2':
                 mostrar_busqueda_producto();
 				break;
-			case 3:
+			case '3':
                 eliminar_producto();
 				break;
-			case 4:
+			case '4':
                 mostrar_lista_producto(Productos);
 				break;
-			case 5:
+			case '5':
                 modificar_producto();
 				break;
-			case 6:
+			case '6':
                 mostrar_producto_existencia_5();
 				break;                
-			case 7:
+			case '7':
 				printf("Volviendo al menu principal\n");
 				break;
 			default:
@@ -891,14 +897,14 @@ void menu_productos() {
 				break;
 		}
 		PAUSA;
-	} while (opcion != 7);
+	} while (opcion != '7');
 }
 
 /*****************************************************************************
  Menu ventas
 *****************************************************************************/
 void menu_ventas() {
-	int opcion;
+	char opcion;
 	do {
 		LIMPIAR_PANTALLA;
 		printf("Menu ventas\n");
@@ -909,24 +915,26 @@ void menu_ventas() {
 		printf("5. Total de ventas general\n");
 		printf("6. Regresar a menu principal\n");
 		printf("Ingresa tu opcion: ");
-		scanf(" %d",&opcion);
+		//scanf(" %d",&opcion);
+		
+		opcion = getch();
 		switch (opcion) {
-			case 1:
+			case '1':
                 entrada_venta();
 				break;
-			case 2:
+			case '2':
                 mostrar_busqueda_nota_venta();
 				break;
-			case 3:
+			case '3':
                 mostrar_lista_venta(Ventas);
 				break;
-			case 4:
+			case '4':
                 reporte_venta_dia_intervalo_nota();
 				break;                
-			case 5:
+			case '5':
 				total_general_venta(Ventas);
 				break;
-			case 6:
+			case '6':
 				printf("Volviendo al menu principal\n");
 				break;
 			default:
@@ -934,7 +942,7 @@ void menu_ventas() {
 				break;
 		}
 		PAUSA;
-	} while(opcion!=6);
+	} while(opcion!='6');
 }
 
 /*****************************************************************************
@@ -1064,7 +1072,7 @@ char *formatear_fecha(int fecha,char buffer[],int tam_buffer){
  Funcion principal
 *****************************************************************************/
 int main() {
-	int opcion;
+	char opcion;
     
     leer_archivo_producto();
     leer_archivo_venta();
@@ -1077,16 +1085,17 @@ int main() {
 		printf("\n2. Menu Ventas");
 		printf("\n3. Salir");
 		printf("\nOpcion: ");
-		scanf("%d", &opcion);
-
+		//scanf("%d", &opcion);
+		
+		opcion = getch();
 		switch (opcion) {
-			case 1:
+			case '1':
 				menu_productos();
 				break;
-			case 2:
+			case '2':
 				menu_ventas();
 				break;
-			case 3:
+			case '3':
 				printf("Saliendo del programa. Tenga buen dia.\n");
 				PAUSA;
 				break;
@@ -1095,7 +1104,7 @@ int main() {
 				PAUSA;
 				break;
 		}
-	} while (opcion != 3);
+	} while (opcion != '3');
     
     guardar_archivo_producto();
     guardar_archivo_venta();
