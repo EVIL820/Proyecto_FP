@@ -26,8 +26,8 @@ struct struct_producto {//Definicion de struct_producto
 	int id_producto;
 	char nombre_producto[101];
 	float precio_compra;
-	int existencia;
 	float precio_venta;
+	int existencia;
 	PRODUCTO *p_siguiente;
 };
 
@@ -342,22 +342,22 @@ void entrada_producto(){
 	scanf(" %100[^\n]",producto.nombre_producto);
 	printf("Precio de compra: ");
 	scanf(" %f",&producto.precio_compra);
-	printf("Unidades en existencia: ");
-	scanf(" %d",&producto.existencia);
 	printf("Precio de venta: ");
 	scanf(" %f",&producto.precio_venta);
+	printf("Unidades en existencia: ");
+	scanf(" %d",&producto.existencia);
 
 	agregar_producto(&Productos,producto);
 	printf("Producto agregado con exito.\n");
 }
 
 void mostrar_producto(PRODUCTO producto){
-    printf("%-8d %-60s %-15.2f %-15d %.2f\n", 
+    printf("%-8d %-60s %-15.2f %-15.2f %d\n", 
            producto.id_producto, 
            producto.nombre_producto, 
            producto.precio_compra, 
-           producto.existencia, 
-           producto.precio_venta);
+           producto.precio_venta,
+           producto.existencia); 
 }
 
 PRODUCTO *p_buscar_producto(LST_PRODUCTO lista,int id_producto){
@@ -378,8 +378,8 @@ void mostrar_lista_producto(LST_PRODUCTO lista){
            "ID", 
            "Nombre del producto", 
            "Precio compra", 
-           "Existencia", 
-           "Precio venta");
+           "Precio venta",
+           "Existencia"); 
     
     while(p_actual!=NULL) {
         mostrar_producto(*p_actual);
@@ -394,6 +394,12 @@ void mostrar_busqueda_producto(){
     scanf("%d",&id_producto);
     p_actual=p_buscar_producto(Productos,id_producto);
     if(p_actual!=NULL)  
+		printf("%-8s %-60s %-15s %-15s %s\n", 
+           "ID", 
+           "Nombre del producto", 
+           "Precio compra", 
+           "Precio venta",
+           "Existencia"); 
         mostrar_producto(*p_actual);
 }
 
@@ -414,8 +420,8 @@ void leer_archivo_producto(void){
     
     limpiar_lista_producto(&Productos);
     
-    while(fscanf(p_archivo,"%d|%[^|]|%f|%d|%f",&producto.id_producto,producto.nombre_producto,&producto.precio_compra,
-                &producto.existencia,&producto.precio_venta)!=EOF){
+    while(fscanf(p_archivo,"%d|%[^|]|%f|%f|%d",&producto.id_producto,producto.nombre_producto,&producto.precio_compra,
+				 &producto.precio_venta,&producto.existencia)!=EOF){
           agregar_producto(&Productos,producto);
     }
     
@@ -427,8 +433,8 @@ void guardar_archivo_producto(void){
     PRODUCTO *p_actual=Productos.p_inicio;
     p_archivo=fopen(F_NOM_PRODUCTOS,"w+");
     while(p_actual !=NULL){
-        fprintf(p_archivo,"%d|%s|%.2f|%d|%.2f\n",p_actual->id_producto,p_actual->nombre_producto,p_actual->precio_compra,
-                p_actual->existencia,p_actual->precio_venta);
+        fprintf(p_archivo,"%d|%s|%.2f|%.2f|%d\n",p_actual->id_producto,p_actual->nombre_producto,p_actual->precio_compra,
+				p_actual->precio_venta,p_actual->existencia);
         p_actual=p_actual->p_siguiente;
     }
     fclose(p_archivo);    
@@ -447,7 +453,7 @@ void limpiar_lista_producto(LST_PRODUCTO *p_lista){
 
 void modificar_producto(void){
     int id_producto;
-	int opcion;
+	char opcion;
     PRODUCTO *p_producto;
     
     printf("Ingrese el id del producto a modificar: ");
@@ -459,41 +465,41 @@ void modificar_producto(void){
 			printf("Seleccione que desea modificar:\n");
 			printf("1. Nombre del producto\n");
 			printf("2. Precio de compra\n");
-			printf("3. Existencia\n");
-			printf("4. Precio de venta\n");
+			printf("3. Precio de venta\n");
+			printf("4. Existencia\n");
 			printf("5. Volver al menu productos\n");
-			printf("Opcion: ");
-			scanf("%d", &opcion);
-
+			printf("Opcion: \n");
+			
+			opcion = getch();
 			switch (opcion) {
-				case 1:
+				case '1':
 					printf("Ingrese el nuevo nombre del producto: ");
 					scanf(" %[^\n]", p_producto->nombre_producto);
 					break;
-				case 2:
+				case '2':
 					printf("Ingrese el nuevo precio de compra del producto: ");
 					scanf(" %f", &p_producto->precio_compra);
 					break;
-				case 3:
-					printf("Ingrese la nueva existencia del producto: ");
-					scanf(" %d", &p_producto->existencia);
-					break;
-				case 4:
+				case '3':
 					printf("Ingrese el nuevo precio de venta del producto: ");
 					scanf(" %f", &p_producto->precio_venta);
 					break;
-				case 5:
+				case '4':
+					printf("Ingrese la nueva existencia del producto: ");
+					scanf(" %d", &p_producto->existencia);
+					break;
+				case '5':
 					printf("Volviendo al menu productos\n");
 					break;
 				default:
 					printf("Opcion no valida.\n");
 					return;
 			}
-			if (opcion >= 1 && opcion <= 4) {
+			if (opcion >= '1' && opcion <= '4') {
 				printf("Producto modificado con exito.\n");
 				PAUSA;
 			}
-		} while(opcion!=5);
+		} while(opcion!='5');
 	} else {
 		printf("Producto no encontrado.\n");
 	}
@@ -593,7 +599,7 @@ void entrada_detalle_venta(int num_venta) {
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
-    printf(" %-20d\t%-2d:%-60s\t%-20d\n", detalle_venta.num_venta,
+    printf(" %-20d\t%d:%-60s\t%-20d\n", detalle_venta.num_venta,
             detalle_venta.num_producto,detalle_venta.p_producto->nombre_producto,detalle_venta.cantidad);
 }
 
@@ -658,14 +664,12 @@ void guardar_archivo_detalle_venta(){
 
 float calcular_total_detalle_venta(LST_PRODUCTO lista_productos,LST_DETALLE_VENTA lista_ventas,int num_venta){
     DETALLE_VENTA *p_actual=lista_ventas.p_inicio;
-    PRODUCTO *p_producto;
     float total=0.0;
     
     while(p_actual!=NULL){
         if(p_actual->num_venta==num_venta){
-            p_producto=p_buscar_producto(lista_productos,p_actual->num_producto);
             if(p_actual->p_producto!=NULL)
-                total=total+p_actual->cantidad*(p_producto->precio_venta);
+                total=total+p_actual->cantidad*(p_actual->p_producto->precio_venta);
         }
         
         p_actual=p_actual->p_siguiente;
@@ -729,8 +733,6 @@ printf(" %-20d\t%-60s\t%-20s\n", venta.num_venta, formatear_fecha(venta.fecha,bu
 
 void mostrar_lista_venta(LST_VENTA lista){
     VENTA *p_actual=lista.p_inicio;
-   
-   //printf("Numero de venta:\tFecha:\t\t\tHora:\n");
 
     while(p_actual!=NULL) {
         mostrar_venta(*p_actual);
@@ -867,7 +869,6 @@ void menu_productos() {
 		printf("6. Listar productos con existencia menor o igual a cinco\n");
 		printf("7. Regresar a menu principal\n");
 		printf("Ingresa tu opcion: \n");
-		//scanf(" %d", &opcion);
 		
 		opcion = getch();
 		switch (opcion) {
@@ -914,8 +915,7 @@ void menu_ventas() {
 		printf("4. Total de ventas por dia, por intervalo de fechas y con numero de nota\n");
 		printf("5. Total de ventas general\n");
 		printf("6. Regresar a menu principal\n");
-		printf("Ingresa tu opcion: ");
-		//scanf(" %d",&opcion);
+		printf("Ingresa tu opcion: \n");
 		
 		opcion = getch();
 		switch (opcion) {
@@ -970,32 +970,86 @@ int siguiente_dia(int dia){
     return aux;
 }
 
-int pedir_hora(char *p_impresion_usuario){
-    int horas,minutos,valido;
-    do{
-        printf(p_impresion_usuario);
-        scanf("%d:%d",&horas,&minutos);
-        //validar horas y minutos
-        if(horas>=0 && horas<60 && minutos>=0 && minutos<60)
-            valido=1;
-        else{
-            valido=0;
-            printf("El rango de horas es de 0 a 23 y el de minutos de 0 a 59\n");
+int pedir_hora(char *p_impresion_usuario) {
+    char hora[6] = {0};
+    int x = 0, c;
+
+    printf("%s", p_impresion_usuario);
+
+    while (x < 5) {
+        c = getch();
+
+        if (c >= '0' && c <= '9') {
+            hora[x++] = c;
+            putchar(c);
+
+            if (x == 2) {
+                hora[x++] = ':'; 
+                putchar(':');
+            }
+        } else if (c == 8 && x > 0) {
+            if (x == 3) {
+                printf("\b \b");
+                x--;
+            }
+            printf("\b \b");
+            x--;
         }
-    }while(valido==0);
-    return horas*100+minutos;
+    }
+
+    hora[x] = '\0';
+    printf("\n");
+
+    int horas, minutos;
+    sscanf(hora, "%2d:%2d", &horas, &minutos);
+
+    if (horas < 0 || horas > 23 || minutos < 0 || minutos > 59) {
+        printf("La hora ingresada es invalida. Vuelva a intentar.\n");
+        return pedir_hora(p_impresion_usuario);
+    }
+
+    return (horas * 100) + minutos;
 }
 
-int pedir_fecha(char *p_impresion_usuario){
-    int year, mon, mday,aux;
-    do{
-        printf(p_impresion_usuario);
-        scanf("%d-%d-%d", &year,&mon,&mday);
-        aux=validar_fecha(year, mon, mday);
-        if(aux==0)
-           printf("La fecha es invalida, vuelva a intentar\n"); 
-    }while(aux==0);   
-    return (year*10000)+(mon*100)+mday;
+int pedir_fecha(char *p_impresion_usuario) {
+    char fecha[11] = {0};
+    int x = 0, c;
+
+    printf("%s", p_impresion_usuario);
+
+    while (x< 10) {
+        c = getch();
+        
+        if (c >= '0' && c <= '9') {
+            fecha[x++] = c;
+            putchar(c);
+            
+            if (x == 4 || x == 7) {
+                fecha[x++] = '-';
+                putchar('-');
+            }
+        } else if (c == 8 && x > 0) {
+            if (x == 5 || x == 8) {
+                printf("\b \b");
+                x--;
+            }
+            printf("\b \b");
+            x--;
+        }
+    }
+
+    fecha[x] = '\0';
+    printf("\n");
+
+    int year, mon, mday;
+    sscanf(fecha, "%4d-%2d-%2d", &year, &mon, &mday);
+
+    if (!validar_fecha(year, mon, mday)) {
+        printf("La fecha ingresada es invalida. Vuelva a intentar.\n");
+        return pedir_fecha(p_impresion_usuario);
+    }
+
+    return (year * 10000) + (mon * 100) + mday;
 }
 
 int validar_fecha(int year, int mon, int mday){
@@ -1085,7 +1139,6 @@ int main() {
 		printf("\n2. Menu Ventas");
 		printf("\n3. Salir");
 		printf("\nOpcion: ");
-		//scanf("%d", &opcion);
 		
 		opcion = getch();
 		switch (opcion) {
