@@ -599,14 +599,17 @@ void entrada_detalle_venta(int num_venta) {
 }
 
 void mostrar_detalle_venta(DETALLE_VENTA detalle_venta){
-    printf(" %-20d\t%d:%-60s\t%-20d\n", detalle_venta.num_venta,
-            detalle_venta.num_producto,detalle_venta.p_producto->nombre_producto,detalle_venta.cantidad);
+    printf("  %3d  %8d  %-60s  %6.2f  %9.2f \n",
+            detalle_venta.num_producto,detalle_venta.cantidad,detalle_venta.p_producto->nombre_producto,
+            detalle_venta.p_producto->precio_venta,
+            detalle_venta.cantidad*detalle_venta.p_producto->precio_venta);
 }
 
 void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
     DETALLE_VENTA *p_actual=lista.p_inicio;
     
     while(p_actual!=NULL) {
+        //printf("  %4d",p_actual->num_venta);
         mostrar_detalle_venta(*p_actual);
         p_actual=p_actual->p_siguiente;
     }
@@ -615,8 +618,9 @@ void mostrar_lista_detalle_venta(LST_DETALLE_VENTA lista){
 void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA lista,int num_venta){
     DETALLE_VENTA *p_actual=lista.p_inicio;
     
-	printf("Numero de venta:\tNumero y nombre de producto:\t\t\t\t\tCantidad:\n");
-	
+	printf("   ID  CANTIDAD  NOMBRE                                        "
+           "                PRECIO      TOTAL \n");
+
     while(p_actual!=NULL) {
         if (p_actual->num_venta==num_venta)
             mostrar_detalle_venta(*p_actual);
@@ -674,7 +678,7 @@ float calcular_total_detalle_venta(LST_PRODUCTO lista_productos,LST_DETALLE_VENT
         
         p_actual=p_actual->p_siguiente;
     }
-    return total;
+    return total;//Este total es el que en el detalle de la nota se muestra como subtotal
 }
 
 /*****************************************************************************
@@ -724,11 +728,19 @@ void entrada_venta(){
 
 
 void mostrar_venta(VENTA venta){
-    char buffer[20];
-    char buffer2[20];
-    printf("Numero de venta:\tFecha:\t\t\t\t\t\t\t\tHora:\n");
-printf(" %-20d\t%-60s\t%-20s\n", venta.num_venta, formatear_fecha(venta.fecha,buffer,20), formatear_hora(venta.hora,buffer2,sizeof(buffer2)));
+    char cadena_fecha[20];
+    char cadena_hora[20];
+    float subtotal=calcular_total_detalle_venta(Productos,Detalles,venta.num_venta);
+    
+    printf(" ------------------------------------------------------------------------------------------------------\n");
+    printf("  NUMERO DE NOTA: %4d                                                FECHA:  %s  HORA: %s  \n",
+           venta.num_venta,formatear_fecha(venta.fecha,cadena_fecha,sizeof(cadena_fecha)), 
+           formatear_hora(venta.hora,cadena_hora,sizeof(cadena_hora)));
+    printf(" ------------------------------------------------------------------------------------------------------\n");
     mostrar_lista_detalle_venta_por_num(Detalles,venta.num_venta);
+    printf(" ------------------------------------------------------------------------------------------------------\n");
+    printf("                                                                              SUBTOTAL:  $%9.2f\n",
+            subtotal);
 }
 
 void mostrar_lista_venta(LST_VENTA lista){
