@@ -396,12 +396,19 @@ void mostrar_busqueda_producto() {
 
 void mostrar_producto_existencia_5() {
 	PRODUCTO *p_actual=Productos.p_inicio;
-	printf("La lista de productos con existencia menor o igual a cinco:\n");
+	int productos_5=0;
 	while(p_actual!=NULL) {
-		if(p_actual->existencia<=5)
+
+		if(p_actual->existencia<=5){
+            if(productos_5==0) {
+			printf("La lista de productos con existencia menor o igual a cinco:\n");
+            productos_5++;
+            }
 			mostrar_producto(*p_actual);
+        }
 		p_actual=p_actual->p_siguiente;
 	}
+	printf("Se mostraron %d productos con existencia menor o igual a cinco\n",productos_5);
 }
 
 void leer_archivo_producto(void) {
