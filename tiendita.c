@@ -95,6 +95,16 @@ char *formatear_fecha(int,char[],int);
 
 char *formatear_hora(int,char[],int);
 
+int es_mon(int);
+
+int es_bisiesto(int);
+
+int revisa_mon(int, int);
+
+int pedir_fecha(char[]);
+
+int es_fecha(int);
+
 /*** producto ***/
 /*
   Asigna memoria y lo castea como puntero
@@ -133,11 +143,6 @@ PRODUCTO *p_buscar_producto(LST_PRODUCTO,int);//Back
   Muestra en pantalla el producto buscado en la lista 
 */
 void mostrar_busqueda_producto();//Front
-
-/*
-  Borra los archivos por el inicio para que se vacie
-*/ 
-void limpiar_lista_producto(LST_PRODUCTO*);//Back
 
 /*
   Abre el archivo F_NOM_PRODUCTOS "Productos.txt" y lo carga en la lista
@@ -212,16 +217,10 @@ void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA,int);//Back
 
 /*
     Abre el archivo F_NOM_DETALLE_VENTAS "Detalles.txt" y lo carga en la lista
-  Primero limpia la lista existente (usa limpiar_lista_detalle_venta) y reemplaza 
   (usando agregar_detalle_venta)
   Cierra el archivo
 */ 
 void leer_archivo_detalle_venta(void);//Back
-
-/*
-    Borra los archivos por el inicio para que se vacie
-*/ 
-void limpiar_lista_detalle_venta(LST_DETALLE_VENTA*);//
 
 /*
     Carga el archivo F_NOM_DETALLE_VENTAS "Detalles.txt", lo crea si no existe y lo
@@ -273,12 +272,6 @@ void leer_archivo_venta(void);//
 void guardar_archivo_venta(void);//
 
 /*
-    
-*/ 
-void limpiar_lista_venta(LST_VENTA*);//
-
-
-/*
   Recibe la lista y busca por el ID (num de nota) y regresa NULL si no 
   encuentra, regresa el apuntador a la venta si la encuentra
 */
@@ -314,12 +307,11 @@ void agregar_producto(LST_PRODUCTO *p_lista, PRODUCTO producto) {
 	*p_nuevo=producto;
     p_nuevo->p_siguiente=NULL;
     
-	if(p_lista->p_fin!=NULL) {
+	if(p_lista->p_fin!=NULL) {//la lista ya tiene elementos
 		p_lista->p_fin->p_siguiente=p_nuevo;
-		p_nuevo->p_siguiente=NULL;
 		p_lista->p_fin=p_nuevo;
 	}
-    else{
+    else{//la lista esta vacia
         p_lista->p_inicio=p_nuevo;
         p_lista->p_fin=p_nuevo;      
     }
@@ -418,8 +410,6 @@ void leer_archivo_producto(void){
     PRODUCTO producto;
     p_archivo=fopen(F_NOM_PRODUCTOS,"r");
     
-    limpiar_lista_producto(&Productos);
-    
     while(fscanf(p_archivo,"%d|%[^|]|%f|%f|%d",&producto.id_producto,producto.nombre_producto,&producto.precio_compra,
 				 &producto.precio_venta,&producto.existencia)!=EOF){
           agregar_producto(&Productos,producto);
@@ -438,17 +428,6 @@ void guardar_archivo_producto(void){
         p_actual=p_actual->p_siguiente;
     }
     fclose(p_archivo);    
-}
-
-void limpiar_lista_producto(LST_PRODUCTO *p_lista){
-     PRODUCTO *p_actual=p_lista->p_inicio;
-     
-    while(p_actual!=NULL){
-         p_lista->p_inicio=p_actual->p_siguiente;
-         free(p_actual);
-         p_actual=p_lista->p_inicio;
-    }
-    p_lista->p_fin=NULL;
 }
 
 void modificar_producto(void){
@@ -550,12 +529,11 @@ void agregar_detalle_venta(LST_DETALLE_VENTA *p_lista, DETALLE_VENTA detalle_ven
 	*p_nuevo=detalle_venta;
     p_nuevo->p_siguiente=NULL;
     
-	if(p_lista->p_fin!=NULL) {
+	if(p_lista->p_fin!=NULL) {//la lista ya tiene elementos
 		p_lista->p_fin->p_siguiente=p_nuevo;
-		p_nuevo->p_siguiente=NULL;
 		p_lista->p_fin=p_nuevo;
 	}
-    else{
+    else{//la lista esta vacia
         p_lista->p_inicio=p_nuevo;
         p_lista->p_fin=p_nuevo;      
     }    
@@ -628,24 +606,10 @@ void mostrar_lista_detalle_venta_por_num(LST_DETALLE_VENTA lista,int num_venta){
     }
 }
 
-void limpiar_lista_detalle_venta(LST_DETALLE_VENTA *p_lista){
-     DETALLE_VENTA *p_actual=p_lista->p_inicio;
-     
-    while(p_actual!=NULL){
-         p_lista->p_inicio=p_actual->p_siguiente;
-         free(p_actual);
-         p_actual=p_lista->p_inicio;
-    }
-    p_lista->p_fin=NULL;
-
-}
-
 void leer_archivo_detalle_venta(){
     FILE *p_archivo;
     DETALLE_VENTA detalle;
     p_archivo=fopen(F_NOM_DETALLE_VENTAS,"r");
-    
-    limpiar_lista_detalle_venta(&Detalles);
     
     while(fscanf(p_archivo,"%d|%d|%d\n",&detalle.num_venta,&detalle.num_producto,&detalle.cantidad)!=EOF){
         detalle.p_producto=p_buscar_producto(Productos,detalle.num_producto);
@@ -693,12 +657,11 @@ void agregar_venta(LST_VENTA *p_lista, VENTA venta) {
 	*p_nuevo=venta;
     p_nuevo->p_siguiente=NULL;
     
-	if(p_lista->p_fin!=NULL) {
+	if(p_lista->p_fin!=NULL) {//la lista tiene elementos
 		p_lista->p_fin->p_siguiente=p_nuevo;
-		p_nuevo->p_siguiente=NULL;
 		p_lista->p_fin=p_nuevo;
 	}
-    else{
+    else{//la lista esta vacia
         p_lista->p_inicio=p_nuevo;
         p_lista->p_fin=p_nuevo;      
     }    
@@ -717,8 +680,8 @@ void entrada_venta(){
             printf("Error: El numero de venta %d ya existe. Por favor, ingrese un numero diferente.\n", venta.num_venta);
     } while (p_venta_existente != NULL);
 
-    venta.fecha = pedir_fecha("Fecha de venta en formato (yyyy-mm-dd): ");
-    venta.hora = pedir_hora("Hora de venta en formato (hh:mm): ");
+    venta.fecha = pedir_fecha("Fecha de venta: ");
+    venta.hora = pedir_hora("Hora de venta: ");
 
     entrada_detalle_venta(venta.num_venta);
     agregar_venta(&Ventas, venta);
@@ -758,8 +721,6 @@ void leer_archivo_venta(){
     VENTA venta;
     p_archivo=fopen(F_NOM_VENTAS,"r");
     
-    limpiar_lista_venta(&Ventas);
-    
     while(fscanf(p_archivo,"%d|%d|%d\n",&venta.num_venta,&venta.fecha,&venta.hora)!=EOF){
           agregar_venta(&Ventas,venta);
     }
@@ -776,18 +737,6 @@ void guardar_archivo_venta(){
         p_actual=p_actual->p_siguiente;
     }
     fclose(p_archivo);   
-
-}
-
-void limpiar_lista_venta(LST_VENTA *p_lista){
-    VENTA *p_actual=p_lista->p_inicio;
-     
-    while(p_actual!=NULL){
-         p_lista->p_inicio=p_actual->p_siguiente;
-         free(p_actual);
-         p_actual=p_lista->p_inicio;
-    }
-    p_lista->p_fin=NULL;    
 
 }
 
@@ -820,8 +769,8 @@ void reporte_venta_dia_intervalo_nota(void){
     char buffer[20];
     VENTA *p_actual;
 
-	fecha_inicio=pedir_fecha("Ingrese la fecha de inicio en formato (yyyy-mm-dd): ");
-	fecha_fin=pedir_fecha("Ingrese la fecha de fin en formato (yyyy-mm-dd): ");
+	fecha_inicio=pedir_fecha("Ingrese la fecha de inicio: ");
+	fecha_fin=pedir_fecha("\nIngrese la fecha de fin: ");
     
     for(int fecha=fecha_inicio;fecha<=fecha_fin;fecha=siguiente_dia(fecha)){
         bandera_encabezado=1; //Hay que mostrar el encabezado
@@ -961,7 +910,7 @@ void menu_ventas() {
  Manejo de fechas y horas
 *****************************************************************************/
 int siguiente_dia(int dia){
-    int aux=0;
+    int dia_siguiente=0;
     struct tm fecha={
         .tm_sec=0,
         .tm_min=0,
@@ -976,10 +925,10 @@ int siguiente_dia(int dia){
     
     segundos_fecha+=24*60*60;
     fecha=*localtime(&segundos_fecha);
-    aux+=(fecha.tm_year+1900)*10000;
-    aux+=(fecha.tm_mon+1)*100;
-    aux+=fecha.tm_mday;
-    return aux;
+    dia_siguiente+=(fecha.tm_year+1900)*10000;
+    dia_siguiente+=(fecha.tm_mon+1)*100;
+    dia_siguiente+=fecha.tm_mday;
+    return dia_siguiente;
 }
 
 int pedir_hora(char *p_impresion_usuario) {
@@ -1023,7 +972,97 @@ int pedir_hora(char *p_impresion_usuario) {
     return (horas * 100) + minutos;
 }
 
-int pedir_fecha(char *p_impresion_usuario) {
+
+
+int es_mon(int mon){
+    if(mon>0&&mon<13)
+        return 1;
+    return 0;
+}
+
+int es_bisiesto(int year){
+    return!(year%4);
+}
+
+int revisa_mon(int mon, int year){
+    if(!es_mon(mon))
+        return 0;
+    switch(mon){
+        case 4:
+        case 6:
+        case 8:
+        case 11:
+            return 30;
+        case 2:
+            if(es_bisiesto(year))
+                return 29;
+            return 28;
+        default:
+            return 31;
+    }
+}
+
+int pedir_fecha(char impresion_fecha[]){
+    char fecha[10]={"YYYY/MM/DD"};
+    int mday=0,mon=0,year=0,tecla;
+    int pos=0;
+    
+    printf("%s",impresion_fecha);
+    printf("%s\b\b\b\b\b\b\b\b\b\b",fecha);
+    while(pos<10||tecla!=13||!es_fecha(year*10000+mon*100+mday)){
+        tecla=getch();
+        if(tecla>='0'&&tecla<='9'&&pos<10){
+            putchar(tecla);
+            fecha[pos++]=tecla;
+            if(pos==4||pos==7){
+                fecha[pos++]='/';
+                putchar('/');
+            }
+        }
+        else if(tecla=='\b'){
+            switch(pos){
+               case 1:
+               case 2:
+               case 3:
+                    printf("\bY\b");
+                    pos--;
+                    break;
+                case 5:
+                    printf("\b\bY\b");
+                    pos=pos-2;
+                    break;
+                case 6:
+                    printf("\bM\b");
+                    pos--;
+                    break;
+                case 8:
+                    printf("\b\bM\b");
+                    pos=pos-2;
+                    break;
+                case 9:
+                case 10:
+                    printf("\bD\b");
+                    pos--;
+                    break;
+            }//end switch
+        }//end else if
+        else if(tecla==13 && (!es_fecha(year*10000+mon*100+mday)||!pos==10)){
+            printf("\a");
+        }
+        sscanf(fecha,"%d/%d/%d",&year,&mon,&mday);
+    }//end while
+    return (year*10000+mon*100+mday);
+}
+
+int es_fecha(int fecha){
+    int year,mon,mday;
+    year=fecha/10000,mon=fecha%10000/100,mday=fecha%100;
+    if (!es_mon(mon)||mday<1||mday>revisa_mon(mon,year))
+        return 0;//FALSO
+    return 1;//VERDADERO
+}
+
+/*int pedir_fecha(char *p_impresion_usuario) {
     char fecha[11] = {0};
     int x = 0, c;
 
@@ -1077,7 +1116,7 @@ int validar_fecha(int year, int mon, int mday){
     if(fecha == reestructura_fecha(fecha))
         return 1;
     return 0;
-}
+}*/
 
 
 int reestructura_fecha (int fecha){
